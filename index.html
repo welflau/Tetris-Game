@@ -69,7 +69,7 @@
         }
 
         @keyframes aaaGlow {
-            0% {
+            from {
                 text-shadow: 
                     0 0 10px #ff6b6b,
                     0 0 20px #ff6b6b,
@@ -78,7 +78,7 @@
                     0 0 50px #ff6b6b;
                 transform: scale(1);
             }
-            100% {
+            to {
                 text-shadow: 
                     0 0 20px #ff6b6b,
                     0 0 30px #ff6b6b,
@@ -102,21 +102,19 @@
         }
 
         @keyframes gameGlow {
-            0% {
+            from {
                 text-shadow: 
                     0 0 10px #00ffff,
                     0 0 20px #00ffff,
                     0 0 30px #00ffff,
                     0 0 40px #00ffff;
-                transform: scale(1);
             }
-            100% {
+            to {
                 text-shadow: 
-                    0 0 15px #00ffff,
-                    0 0 25px #00ffff,
-                    0 0 35px #00ffff,
-                    0 0 45px #00ffff;
-                transform: scale(1.02);
+                    0 0 20px #00ffff,
+                    0 0 30px #00ffff,
+                    0 0 40px #00ffff,
+                    0 0 50px #00ffff;
             }
         }
 
@@ -124,134 +122,94 @@
             display: flex;
             gap: 30px;
             align-items: flex-start;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .game-board {
-            width: 300px;
-            height: 600px;
             border: 3px solid #ffffff;
+            border-radius: 10px;
+            box-shadow: 
+                0 0 20px rgba(255, 255, 255, 0.3),
+                inset 0 0 20px rgba(0, 0, 0, 0.3);
             background: rgba(0, 0, 0, 0.8);
-            position: relative;
-            border-radius: 10px;
-            overflow: hidden;
         }
 
-        .info-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        .game-info {
             color: #ffffff;
-        }
-
-        .score-display {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px;
-            border-radius: 10px;
             text-align: center;
+            min-width: 200px;
         }
 
-        .score-display h3 {
-            margin-bottom: 10px;
+        .score-board {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .score-item {
+            margin: 10px 0;
             font-size: 1.2rem;
-        }
-
-        .score-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #ffd93d;
         }
 
         .next-piece {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            text-align: center;
-        }
-
-        .next-piece h3 {
-            margin-bottom: 10px;
-            font-size: 1.2rem;
-        }
-
-        .next-preview {
-            width: 80px;
-            height: 80px;
-            border: 2px solid #ffffff;
-            background: rgba(0, 0, 0, 0.5);
-            margin: 0 auto;
-            border-radius: 5px;
+            padding: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
 
         .controls {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px;
-            border-radius: 10px;
-        }
-
-        .controls h3 {
-            margin-bottom: 10px;
-            font-size: 1.2rem;
+            margin-top: 20px;
             text-align: center;
+            color: #ffffff;
         }
 
         .control-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
+            margin: 5px 0;
             font-size: 0.9rem;
         }
 
-        .game-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn {
-            padding: 10px 20px;
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
             border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1rem;
             border-radius: 5px;
-            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
-            color: #ffffff;
-            font-weight: bold;
             cursor: pointer;
+            margin: 5px;
             transition: all 0.3s ease;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
+        button:hover {
+            transform: scale(1.05);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
-        .btn:active {
-            transform: translateY(0);
-        }
-
         .game-over {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            color: #ffffff;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
             display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
         }
 
-        .game-over h2 {
-            margin-bottom: 15px;
-            color: #ff6b6b;
-        }
-
-        .game-over p {
-            margin-bottom: 20px;
+        .game-over-content {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            color: white;
+            border: 3px solid #ffffff;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
         }
 
         @media (max-width: 768px) {
@@ -268,13 +226,6 @@
             .game-container {
                 flex-direction: column;
                 align-items: center;
-                gap: 20px;
-                padding: 20px;
-            }
-            
-            .game-board {
-                width: 250px;
-                height: 500px;
             }
         }
     </style>
@@ -286,64 +237,38 @@
     </div>
     
     <div class="game-container">
-        <div class="game-board" id="gameBoard">
-            <div class="game-over" id="gameOver">
-                <h2>游戏结束</h2>
-                <p>最终得分: <span id="finalScore">0</span></p>
-                <button class="btn" onclick="restartGame()">重新开始</button>
-            </div>
-        </div>
-        
-        <div class="info-panel">
-            <div class="score-display">
-                <h3>得分</h3>
-                <div class="score-value" id="score">0</div>
-            </div>
-            
-            <div class="score-display">
-                <h3>等级</h3>
-                <div class="score-value" id="level">1</div>
-            </div>
-            
-            <div class="score-display">
-                <h3>消除行数</h3>
-                <div class="score-value" id="lines">0</div>
+        <div class="game-info">
+            <div class="score-board">
+                <div class="score-item">分数: <span id="score">0</span></div>
+                <div class="score-item">等级: <span id="level">1</span></div>
+                <div class="score-item">行数: <span id="lines">0</span></div>
             </div>
             
             <div class="next-piece">
-                <h3>下一个</h3>
-                <div class="next-preview" id="nextPreview"></div>
+                <h3>下一个方块</h3>
+                <canvas id="nextCanvas" width="120" height="120"></canvas>
             </div>
             
             <div class="controls">
-                <h3>操作说明</h3>
-                <div class="control-item">
-                    <span>左移:</span>
-                    <span>← 或 A</span>
-                </div>
-                <div class="control-item">
-                    <span>右移:</span>
-                    <span>→ 或 D</span>
-                </div>
-                <div class="control-item">
-                    <span>下降:</span>
-                    <span>↓ 或 S</span>
-                </div>
-                <div class="control-item">
-                    <span>旋转:</span>
-                    <span>↑ 或 W</span>
-                </div>
-                <div class="control-item">
-                    <span>暂停:</span>
-                    <span>空格</span>
-                </div>
+                <h3>控制说明</h3>
+                <div class="control-item">← → 移动</div>
+                <div class="control-item">↓ 加速下降</div>
+                <div class="control-item">↑ 旋转</div>
+                <div class="control-item">空格 暂停</div>
+                <button onclick="startGame()">开始游戏</button>
+                <button onclick="pauseGame()">暂停</button>
+                <button onclick="resetGame()">重新开始</button>
             </div>
-            
-            <div class="game-buttons">
-                <button class="btn" onclick="startGame()">开始游戏</button>
-                <button class="btn" onclick="pauseGame()">暂停</button>
-                <button class="btn" onclick="restartGame()">重新开始</button>
-            </div>
+        </div>
+        
+        <canvas id="gameCanvas" class="game-board" width="300" height="600"></canvas>
+    </div>
+    
+    <div class="game-over" id="gameOver">
+        <div class="game-over-content">
+            <h2>游戏结束</h2>
+            <p>最终分数: <span id="finalScore">0</span></p>
+            <button onclick="resetGame()">再来一局</button>
         </div>
     </div>
 
@@ -351,10 +276,10 @@
         // 游戏配置
         const BOARD_WIDTH = 10;
         const BOARD_HEIGHT = 20;
-        const CELL_SIZE = 30;
+        const BLOCK_SIZE = 30;
         
         // 游戏状态
-        let gameBoard = [];
+        let board = [];
         let currentPiece = null;
         let nextPiece = null;
         let score = 0;
@@ -362,12 +287,21 @@
         let lines = 0;
         let gameRunning = false;
         let gamePaused = false;
-        let gameInterval = null;
+        let dropTime = 0;
+        let dropInterval = 1000;
         
-        // 方块类型定义
+        // Canvas 元素
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const nextCanvas = document.getElementById('nextCanvas');
+        const nextCtx = nextCanvas.getContext('2d');
+        
+        // 俄罗斯方块形状定义
         const PIECES = {
             I: {
-                shape: [[1, 1, 1, 1]],
+                shape: [
+                    [1, 1, 1, 1]
+                ],
                 color: '#00ffff'
             },
             O: {
@@ -416,100 +350,94 @@
         
         // 初始化游戏板
         function initBoard() {
-            gameBoard = [];
-            for (let row = 0; row < BOARD_HEIGHT; row++) {
-                gameBoard[row] = [];
-                for (let col = 0; col < BOARD_WIDTH; col++) {
-                    gameBoard[row][col] = 0;
+            board = [];
+            for (let y = 0; y < BOARD_HEIGHT; y++) {
+                board[y] = [];
+                for (let x = 0; x < BOARD_WIDTH; x++) {
+                    board[y][x] = 0;
                 }
             }
         }
         
         // 创建新方块
         function createPiece() {
-            const pieceTypes = Object.keys(PIECES);
-            const randomType = pieceTypes[Math.floor(Math.random() * pieceTypes.length)];
-            const piece = PIECES[randomType];
+            const pieces = Object.keys(PIECES);
+            const randomPiece = pieces[Math.floor(Math.random() * pieces.length)];
+            const pieceData = PIECES[randomPiece];
             
             return {
-                type: randomType,
-                shape: piece.shape,
-                color: piece.color,
-                x: Math.floor(BOARD_WIDTH / 2) - Math.floor(piece.shape[0].length / 2),
+                shape: pieceData.shape,
+                color: pieceData.color,
+                x: Math.floor(BOARD_WIDTH / 2) - Math.floor(pieceData.shape[0].length / 2),
                 y: 0
             };
         }
         
-        // 检查方块是否可以放置
-        function canPlacePiece(piece, x, y, shape = piece.shape) {
-            for (let row = 0; row < shape.length; row++) {
-                for (let col = 0; col < shape[row].length; col++) {
-                    if (shape[row][col]) {
-                        const newX = x + col;
-                        const newY = y + row;
+        // 旋转方块
+        function rotatePiece(piece) {
+            const rotated = [];
+            const rows = piece.shape.length;
+            const cols = piece.shape[0].length;
+            
+            for (let i = 0; i < cols; i++) {
+                rotated[i] = [];
+                for (let j = 0; j < rows; j++) {
+                    rotated[i][j] = piece.shape[rows - 1 - j][i];
+                }
+            }
+            
+            return {
+                ...piece,
+                shape: rotated
+            };
+        }
+        
+        // 检查碰撞
+        function checkCollision(piece, dx = 0, dy = 0) {
+            for (let y = 0; y < piece.shape.length; y++) {
+                for (let x = 0; x < piece.shape[y].length; x++) {
+                    if (piece.shape[y][x]) {
+                        const newX = piece.x + x + dx;
+                        const newY = piece.y + y + dy;
                         
                         if (newX < 0 || newX >= BOARD_WIDTH || newY >= BOARD_HEIGHT) {
-                            return false;
+                            return true;
                         }
                         
-                        if (newY >= 0 && gameBoard[newY][newX]) {
-                            return false;
+                        if (newY >= 0 && board[newY][newX]) {
+                            return true;
                         }
                     }
                 }
             }
-            return true;
+            return false;
         }
         
         // 放置方块到游戏板
         function placePiece(piece) {
-            for (let row = 0; row < piece.shape.length; row++) {
-                for (let col = 0; col < piece.shape[row].length; col++) {
-                    if (piece.shape[row][col]) {
-                        const x = piece.x + col;
-                        const y = piece.y + row;
-                        if (y >= 0) {
-                            gameBoard[y][x] = piece.color;
+            for (let y = 0; y < piece.shape.length; y++) {
+                for (let x = 0; x < piece.shape[y].length; x++) {
+                    if (piece.shape[y][x]) {
+                        const boardY = piece.y + y;
+                        const boardX = piece.x + x;
+                        if (boardY >= 0) {
+                            board[boardY][boardX] = piece.color;
                         }
                     }
                 }
             }
         }
         
-        // 旋转方块
-        function rotatePiece(shape) {
-            const rows = shape.length;
-            const cols = shape[0].length;
-            const rotated = [];
-            
-            for (let col = 0; col < cols; col++) {
-                rotated[col] = [];
-                for (let row = rows - 1; row >= 0; row--) {
-                    rotated[col][rows - 1 - row] = shape[row][col];
-                }
-            }
-            
-            return rotated;
-        }
-        
-        // 清除完整的行
+        // 清除完整行
         function clearLines() {
             let linesCleared = 0;
             
-            for (let row = BOARD_HEIGHT - 1; row >= 0; row--) {
-                let isComplete = true;
-                for (let col = 0; col < BOARD_WIDTH; col++) {
-                    if (!gameBoard[row][col]) {
-                        isComplete = false;
-                        break;
-                    }
-                }
-                
-                if (isComplete) {
-                    gameBoard.splice(row, 1);
-                    gameBoard.unshift(new Array(BOARD_WIDTH).fill(0));
+            for (let y = BOARD_HEIGHT - 1; y >= 0; y--) {
+                if (board[y].every(cell => cell !== 0)) {
+                    board.splice(y, 1);
+                    board.unshift(new Array(BOARD_WIDTH).fill(0));
                     linesCleared++;
-                    row++; // 重新检查当前行
+                    y++; // 重新检查同一行
                 }
             }
             
@@ -517,119 +445,113 @@
                 lines += linesCleared;
                 score += linesCleared * 100 * level;
                 level = Math.floor(lines / 10) + 1;
-                updateDisplay();
+                dropInterval = Math.max(100, 1000 - (level - 1) * 100);
+                updateScore();
             }
         }
         
-        // 移动方块
-        function movePiece(dx, dy) {
-            if (!currentPiece) return false;
-            
-            const newX = currentPiece.x + dx;
-            const newY = currentPiece.y + dy;
-            
-            if (canPlacePiece(currentPiece, newX, newY)) {
-                currentPiece.x = newX;
-                currentPiece.y = newY;
-                return true;
-            }
-            
-            return false;
+        // 更新分数显示
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('level').textContent = level;
+            document.getElementById('lines').textContent = lines;
         }
         
-        // 旋转当前方块
-        function rotateCurrentPiece() {
-            if (!currentPiece) return;
-            
-            const rotatedShape = rotatePiece(currentPiece.shape);
-            if (canPlacePiece(currentPiece, currentPiece.x, currentPiece.y, rotatedShape)) {
-                currentPiece.shape = rotatedShape;
-            }
+        // 绘制方块
+        function drawBlock(ctx, x, y, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
         }
         
-        // 方块下落
-        function dropPiece() {
-            if (!movePiece(0, 1)) {
-                placePiece(currentPiece);
-                clearLines();
-                currentPiece = nextPiece;
-                nextPiece = createPiece();
-                
-                if (!canPlacePiece(currentPiece, currentPiece.x, currentPiece.y)) {
-                    gameOver();
-                }
-            }
-        }
-        
-        // 渲染游戏
-        function render() {
-            const canvas = document.getElementById('gameCanvas');
-            if (!canvas) {
-                createCanvas();
-                return;
-            }
-            
-            const ctx = canvas.getContext('2d');
+        // 绘制游戏板
+        function drawBoard() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // 绘制游戏板
-            for (let row = 0; row < BOARD_HEIGHT; row++) {
-                for (let col = 0; col < BOARD_WIDTH; col++) {
-                    if (gameBoard[row][col]) {
-                        ctx.fillStyle = gameBoard[row][col];
-                        ctx.fillRect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE - 1, CELL_SIZE - 1);
+            // 绘制已放置的方块
+            for (let y = 0; y < BOARD_HEIGHT; y++) {
+                for (let x = 0; x < BOARD_WIDTH; x++) {
+                    if (board[y][x]) {
+                        drawBlock(ctx, x, y, board[y][x]);
                     }
                 }
             }
             
             // 绘制当前方块
             if (currentPiece) {
-                ctx.fillStyle = currentPiece.color;
-                for (let row = 0; row < currentPiece.shape.length; row++) {
-                    for (let col = 0; col < currentPiece.shape[row].length; col++) {
-                        if (currentPiece.shape[row][col]) {
-                            const x = (currentPiece.x + col) * CELL_SIZE;
-                            const y = (currentPiece.y + row) * CELL_SIZE;
-                            ctx.fillRect(x, y, CELL_SIZE - 1, CELL_SIZE - 1);
+                for (let y = 0; y < currentPiece.shape.length; y++) {
+                    for (let x = 0; x < currentPiece.shape[y].length; x++) {
+                        if (currentPiece.shape[y][x]) {
+                            drawBlock(ctx, currentPiece.x + x, currentPiece.y + y, currentPiece.color);
                         }
                     }
                 }
             }
         }
         
-        // 创建画布
-        function createCanvas() {
-            const gameBoard = document.getElementById('gameBoard');
-            const canvas = document.createElement('canvas');
-            canvas.id = 'gameCanvas';
-            canvas.width = BOARD_WIDTH * CELL_SIZE;
-            canvas.height = BOARD_HEIGHT * CELL_SIZE;
-            canvas.style.display = 'block';
-            gameBoard.appendChild(canvas);
+        // 绘制下一个方块
+        function drawNextPiece() {
+            nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
+            
+            if (nextPiece) {
+                const offsetX = (nextCanvas.width - nextPiece.shape[0].length * 20) / 2;
+                const offsetY = (nextCanvas.height - nextPiece.shape.length * 20) / 2;
+                
+                for (let y = 0; y < nextPiece.shape.length; y++) {
+                    for (let x = 0; x < nextPiece.shape[y].length; x++) {
+                        if (nextPiece.shape[y][x]) {
+                            nextCtx.fillStyle = nextPiece.color;
+                            nextCtx.fillRect(offsetX + x * 20, offsetY + y * 20, 20, 20);
+                            nextCtx.strokeStyle = '#ffffff';
+                            nextCtx.strokeRect(offsetX + x * 20, offsetY + y * 20, 20, 20);
+                        }
+                    }
+                }
+            }
         }
         
-        // 更新显示
-        function updateDisplay() {
-            document.getElementById('score').textContent = score;
-            document.getElementById('level').textContent = level;
-            document.getElementById('lines').textContent = lines;
+        // 游戏主循环
+        function gameLoop(timestamp) {
+            if (!gameRunning || gamePaused) {
+                if (gameRunning) {
+                    requestAnimationFrame(gameLoop);
+                }
+                return;
+            }
+            
+            if (timestamp - dropTime > dropInterval) {
+                if (!checkCollision(currentPiece, 0, 1)) {
+                    currentPiece.y++;
+                } else {
+                    placePiece(currentPiece);
+                    clearLines();
+                    currentPiece = nextPiece;
+                    nextPiece = createPiece();
+                    
+                    if (checkCollision(currentPiece)) {
+                        gameOver();
+                        return;
+                    }
+                }
+                dropTime = timestamp;
+            }
+            
+            drawBoard();
+            drawNextPiece();
+            requestAnimationFrame(gameLoop);
         }
         
         // 游戏结束
         function gameOver() {
             gameRunning = false;
-            if (gameInterval) {
-                clearInterval(gameInterval);
-            }
-            
             document.getElementById('finalScore').textContent = score;
-            document.getElementById('gameOver').style.display = 'block';
+            document.getElementById('gameOver').style.display = 'flex';
         }
         
         // 开始游戏
         function startGame() {
-            if (gameRunning && !gamePaused) return;
-            
             if (!gameRunning) {
                 initBoard();
                 currentPiece = createPiece();
@@ -637,91 +559,71 @@
                 score = 0;
                 level = 1;
                 lines = 0;
-                updateDisplay();
+                dropInterval = 1000;
+                gameRunning = true;
+                gamePaused = false;
+                updateScore();
                 document.getElementById('gameOver').style.display = 'none';
+                requestAnimationFrame(gameLoop);
             }
-            
-            gameRunning = true;
-            gamePaused = false;
-            
-            if (gameInterval) {
-                clearInterval(gameInterval);
-            }
-            
-            gameInterval = setInterval(() => {
-                if (!gamePaused) {
-                    dropPiece();
-                    render();
-                }
-            }, Math.max(100, 1000 - (level - 1) * 100));
         }
         
         // 暂停游戏
         function pauseGame() {
-            if (!gameRunning) return;
-            
-            gamePaused = !gamePaused;
+            if (gameRunning) {
+                gamePaused = !gamePaused;
+            }
         }
         
-        // 重新开始游戏
-        function restartGame() {
-            if (gameInterval) {
-                clearInterval(gameInterval);
-            }
-            
+        // 重置游戏
+        function resetGame() {
             gameRunning = false;
             gamePaused = false;
             document.getElementById('gameOver').style.display = 'none';
-            
-            // 清除画布
-            const canvas = document.getElementById('gameCanvas');
-            if (canvas) {
-                const ctx = canvas.getContext('2d');
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-            }
-            
             startGame();
         }
         
-        // 键盘事件处理
-        document.addEventListener('keydown', (event) => {
+        // 键盘控制
+        document.addEventListener('keydown', (e) => {
             if (!gameRunning || gamePaused) return;
             
-            switch (event.key) {
+            switch (e.key) {
                 case 'ArrowLeft':
-                case 'a':
-                case 'A':
-                    movePiece(-1, 0);
+                    if (!checkCollision(currentPiece, -1, 0)) {
+                        currentPiece.x--;
+                    }
                     break;
                 case 'ArrowRight':
-                case 'd':
-                case 'D':
-                    movePiece(1, 0);
+                    if (!checkCollision(currentPiece, 1, 0)) {
+                        currentPiece.x++;
+                    }
                     break;
                 case 'ArrowDown':
-                case 's':
-                case 'S':
-                    dropPiece();
+                    if (!checkCollision(currentPiece, 0, 1)) {
+                        currentPiece.y++;
+                        score += 1;
+                        updateScore();
+                    }
                     break;
                 case 'ArrowUp':
-                case 'w':
-                case 'W':
-                    rotateCurrentPiece();
+                    const rotated = rotatePiece(currentPiece);
+                    if (!checkCollision(rotated)) {
+                        currentPiece = rotated;
+                    }
                     break;
                 case ' ':
                     pauseGame();
                     break;
             }
             
-            render();
-            event.preventDefault();
+            drawBoard();
+            e.preventDefault();
         });
         
-        // 页面加载完成后初始化
-        window.addEventListener('load', () => {
-            createCanvas();
-            render();
-        });
+        // 初始化游戏
+        initBoard();
+        drawBoard();
+        drawNextPiece();
     </script>
 </body>
 </html>
