@@ -22,7 +22,7 @@ class TestOtherModule:
         
         # 检查title标签是否存在且包含AAA
         title_tag = soup.find('title')
-        assert title_tag is not None, "HTML文件中缺少title标签"
+        assert title_tag is not None, "HTML文件中未找到title标签"
         assert 'AAA' in title_tag.get_text(), "页面标题中未包含AAA文本"
     
     def test_index_html_has_basic_structure(self):
