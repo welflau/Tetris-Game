@@ -20,8 +20,8 @@ class TestOtherModule:
         title_pattern = r'<title[^>]*>.*?</title>'
         assert re.search(title_pattern, content, re.IGNORECASE | re.DOTALL), "HTML 文件中缺少 title 标签"
     
-    def test_index_html_title_content_not_empty(self):
-        """测试 index.html 文件中的 title 标签内容不为空，验证页面标题AAA显示问题"""
+    def test_index_html_title_not_empty(self):
+        """测试 index.html 文件的 title 标签内容不为空，验证页面标题AAA显示问题"""
         index_file = Path("index.html")
         assert index_file.exists(), "index.html 文件不存在"
         
@@ -30,7 +30,7 @@ class TestOtherModule:
         title_pattern = r'<title[^>]*>(.*?)</title>'
         title_match = re.search(title_pattern, content, re.IGNORECASE | re.DOTALL)
         
-        assert title_match, "未找到 title 标签"
+        assert title_match, "HTML 文件中缺少 title 标签"
         title_content = title_match.group(1).strip()
         assert title_content, "title 标签内容为空，这可能是页面标题AAA未显示的原因"
         assert len(title_content) > 0, "title 标签内容长度为0"
