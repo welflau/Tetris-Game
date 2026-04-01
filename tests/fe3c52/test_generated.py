@@ -3,7 +3,6 @@ from pathlib import Path
 import re
 
 class TestOtherModule:
-    """测试 other 模块的相关功能"""
     
     def test_index_html_file_exists(self):
         """测试 index.html 文件是否存在"""
@@ -22,7 +21,7 @@ class TestOtherModule:
         assert re.search(title_pattern, content, re.IGNORECASE | re.DOTALL), "HTML 文件中未找到 title 标签"
     
     def test_index_html_title_content_not_empty(self):
-        """测试 index.html 文件的 title 标签内容不为空，检查是否存在 AAA 标题显示问题"""
+        """测试 index.html 文件的 title 标签内容不为空，验证标题AAA显示问题"""
         index_file = Path("index.html")
         assert index_file.exists(), "index.html 文件不存在"
         
@@ -33,8 +32,8 @@ class TestOtherModule:
         
         assert title_match, "未找到 title 标签"
         title_content = title_match.group(1).strip()
-        assert title_content, "title 标签内容为空，可能导致页面标题未显示"
-        assert len(title_content) > 0, "title 内容长度为 0"
+        assert title_content, "title 标签内容为空，这可能是导致页面标题AAA未显示的原因"
+        assert len(title_content) > 0, "title 标签内容长度为0"
     
     def test_dev_notes_file_exists(self):
         """测试开发文档文件是否存在"""
@@ -57,7 +56,7 @@ class TestOtherModule:
         assert index_file.exists(), "index.html 文件不存在"
         
         content = index_file.read_text(encoding='utf-8')
-        # 检查基本 HTML 结构
+        # 检查基本的 HTML 结构
         assert re.search(r'<html[^>]*>', content, re.IGNORECASE), "缺少 html 开始标签"
         assert re.search(r'<head[^>]*>', content, re.IGNORECASE), "缺少 head 标签"
         assert re.search(r'<body[^>]*>', content, re.IGNORECASE), "缺少 body 标签"
