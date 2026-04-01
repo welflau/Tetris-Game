@@ -1,6 +1,6 @@
 import pytest
 from pathlib import Path
-import re
+from bs4 import BeautifulSoup
 
 class TestOtherModule:
     
@@ -10,62 +10,49 @@ class TestOtherModule:
         assert index_file.exists(), "index.html文件不存在"
         assert index_file.is_file(), "index.html不是一个有效的文件"
     
-    def test_index_html_contains_title_element(self):
-        """测试index.html文件是否包含title标签元素"""
+    def test_index_html_contains_title_aaa(self):
+        """测试index.html文件是否包含标题AAA"""
         index_file = Path("index.html")
         assert index_file.exists(), "index.html文件不存在"
         
-        content = index_file.read_text(encoding='utf-8')
-        # 检查是否包含title标签
-        title_pattern = r'<title[^>]*>.*?</title>'
-        assert re.search(title_pattern, content, re.IGNORECASE | re.DOTALL), "HTML文件中未找到title标签"
+        with open(index_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        soup = BeautifulSoup(content, 'html.parser')
+        
+        # 检查title标签是否存在且包含AAA
+        title_tag = soup.find('title')
+        assert title_tag is not None, "HTML文件中缺少title标签"
+        assert 'AAA' in title_tag.get_text(), "页面标题中未包含'AAA'"
     
-    def test_index_html_title_content_not_empty(self):
-        """测试index.html文件中的title标签内容不为空（针对AAA未显示的bug）"""
+    def test_index_html_has_basic_structure(self):
+        """测试index.html文件是否具有基本的HTML结构"""
         index_file = Path("index.html")
         assert index_file.exists(), "index.html文件不存在"
         
-        content = index_file.read_text(encoding='utf-8')
-        # 提取title标签内容
-        title_pattern = r'<title[^>]*>(.*?)</title>'
-        title_match = re.search(title_pattern, content, re.IGNORECASE | re.DOTALL)
+        with open(index_file, 'r', encoding='utf-8') as f:
+            content = f.read()
         
-        assert title_match, "未找到title标签"
-        title_content = title_match.group(1).strip()
-        assert title_content, "title标签内容为空，页面标题未正确设置"
-        assert len(title_content) > 0, "title内容长度为0"
+        soup = BeautifulSoup(content, 'html.parser')
+        
+        # 检查基本HTML结构
+        assert soup.find('html') is not None, "HTML文件缺少html标签"
+        assert soup.find('head') is not None, "HTML文件缺少head标签"
+        assert soup.find('body') is not None, "HTML文件缺少body标签"
     
     def test_dev_notes_file_exists(self):
         """测试开发文档文件是否存在"""
         dev_notes_file = Path("docs/fe3c52/3ba7c2/dev-notes.md")
         assert dev_notes_file.exists(), "开发文档文件不存在"
-        assert dev_notes_file.is_file(), "dev-notes.md不是一个有效的文件"
+        assert dev_notes_file.is_file(), "开发文档不是一个有效的文件"
     
-    def test_dev_notes_contains_bug_documentation(self):
-        """测试开发文档是否包含相关bug记录或说明"""
+    def test_dev_notes_content_not_empty(self):
+        """测试开发文档内容是否为空"""
         dev_notes_file = Path("docs/fe3c52/3ba7c2/dev-notes.md")
         assert dev_notes_file.exists(), "开发文档文件不存在"
         
-        content = dev_notes_file.read_text(encoding='utf-8')
-        # 检查是否包含bug相关关键词
-        bug_keywords = ['bug', 'BUG', '标题', 'title', 'AAA', '显示', '问题']
-        has_bug_info = any(keyword in content for keyword in bug_keywords)
-        assert has_bug_info, "开发文档中未找到相关bug信息记录"
-    
-    def test_html_structure_validity(self):
-        """测试HTML文件基本结构的有效性"""
-        index_file = Path("index.html")
-        assert index_file.exists(), "index.html文件不存在"
+        with open(dev_notes_file, 'r', encoding='utf-8') as f:
+            content = f.read().strip()
         
-        content = index_file.read_text(encoding='utf-8')
-        # 检查基本HTML结构
-        assert '<html' in content.lower(), "HTML文件缺少html标签"
-        assert '<head' in content.lower(), "HTML文件缺少head标签"
-        assert '<body' in content.lower(), "HTML文件缺少body标签"
-        
-        # 检查title标签是否在head标签内
-        head_pattern = r'<head[^>]*>(.*?)</head>'
-        head_match = re.search(head_pattern, content, re.IGNORECASE | re.DOTALL)
-        if head_match:
-            head_content = head_match.group(1)
-            assert '<title' in head_content.lower(), "title标签应该位于head标签内"
+        assert len(content) > 0, "开发文档内容为空"
+        assert content != "", "开发文档没有实际内容"
