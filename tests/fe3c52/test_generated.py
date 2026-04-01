@@ -32,14 +32,14 @@ class TestOtherModule:
         
         assert title_match, "未找到title标签"
         title_content = title_match.group(1).strip()
-        assert title_content, "title标签内容为空，这可能是AAA标题未显示的原因"
-        assert len(title_content) > 0, "title内容长度为0"
+        assert title_content, "title标签内容为空，这可能是导致页面标题AAA未显示的原因"
+        assert len(title_content) > 0, "title标签内容长度为0"
     
     def test_dev_notes_file_exists(self):
         """测试开发文档文件是否存在"""
         dev_notes_file = Path("docs/fe3c52/3ba7c2/dev-notes.md")
         assert dev_notes_file.exists(), "开发文档文件不存在"
-        assert dev_notes_file.is_file(), "dev-notes.md不是一个有效的文件"
+        assert dev_notes_file.is_file(), "开发文档路径不是一个有效的文件"
     
     def test_dev_notes_contains_content(self):
         """测试开发文档文件是否包含有效内容"""
@@ -60,3 +60,9 @@ class TestOtherModule:
         assert re.search(r'<html[^>]*>', content, re.IGNORECASE), "缺少html开始标签"
         assert re.search(r'<head[^>]*>', content, re.IGNORECASE), "缺少head标签"
         assert re.search(r'<body[^>]*>', content, re.IGNORECASE), "缺少body标签"
+        
+        # 确保head标签在body标签之前
+        head_pos = content.lower().find('<head')
+        body_pos = content.lower().find('<body')
+        if head_pos != -1 and body_pos != -1:
+            assert head_pos < body_pos, "HTML结构错误：head标签应该在body标签之前"
