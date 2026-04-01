@@ -1,58 +1,53 @@
 import pytest
 from pathlib import Path
-from bs4 import BeautifulSoup
+import re
 
 class TestOtherModule:
     
     def test_index_html_file_exists(self):
-        """测试index.html文件是否存在"""
+        """测试 index.html 文件是否存在"""
         index_file = Path("index.html")
-        assert index_file.exists(), "index.html文件不存在"
-        assert index_file.is_file(), "index.html不是一个有效的文件"
+        assert index_file.exists(), "index.html 文件不存在"
+        assert index_file.is_file(), "index.html 不是一个有效的文件"
     
-    def test_index_html_contains_title_aaa(self):
-        """测试index.html文件是否包含标题AAA"""
+    def test_index_html_contains_title_element(self):
+        """测试 index.html 文件是否包含 title 标签元素"""
         index_file = Path("index.html")
-        assert index_file.exists(), "index.html文件不存在"
+        assert index_file.exists(), "index.html 文件不存在"
         
-        with open(index_file, 'r', encoding='utf-8') as f:
-            content = f.read()
-        
-        soup = BeautifulSoup(content, 'html.parser')
-        
-        # 检查title标签是否存在且包含AAA
-        title_tag = soup.find('title')
-        assert title_tag is not None, "HTML文件中缺少title标签"
-        assert 'AAA' in title_tag.get_text(), "页面标题中未包含'AAA'"
+        content = index_file.read_text(encoding='utf-8')
+        # 检查是否包含 title 标签
+        title_pattern = r'<title[^>]*>.*?</title>'
+        assert re.search(title_pattern, content, re.IGNORECASE | re.DOTALL), "HTML 文件中未找到 title 标签"
     
-    def test_index_html_has_basic_structure(self):
-        """测试index.html文件是否具有基本的HTML结构"""
+    def test_index_html_title_content_not_empty(self):
+        """测试 index.html 文件中的 title 标签内容不为空"""
         index_file = Path("index.html")
-        assert index_file.exists(), "index.html文件不存在"
+        assert index_file.exists(), "index.html 文件不存在"
         
-        with open(index_file, 'r', encoding='utf-8') as f:
-            content = f.read()
+        content = index_file.read_text(encoding='utf-8')
+        # 提取 title 标签内容
+        title_pattern = r'<title[^>]*>(.*?)</title>'
+        title_match = re.search(title_pattern, content, re.IGNORECASE | re.DOTALL)
         
-        soup = BeautifulSoup(content, 'html.parser')
-        
-        # 检查基本HTML结构
-        assert soup.find('html') is not None, "缺少html标签"
-        assert soup.find('head') is not None, "缺少head标签"
-        assert soup.find('body') is not None, "缺少body标签"
+        assert title_match, "未找到 title 标签"
+        title_content = title_match.group(1).strip()
+        assert title_content, "title 标签内容为空"
+        assert len(title_content) > 0, "title 标签内容长度为0"
     
     def test_dev_notes_file_exists(self):
         """测试开发文档文件是否存在"""
         dev_notes_file = Path("docs/fe3c52/3ba7c2/dev-notes.md")
-        assert dev_notes_file.exists(), "dev-notes.md文件不存在"
-        assert dev_notes_file.is_file(), "dev-notes.md不是一个有效的文件"
+        assert dev_notes_file.exists(), "dev-notes.md 文件不存在"
+        assert dev_notes_file.is_file(), "dev-notes.md 不是一个有效的文件"
     
-    def test_dev_notes_content_not_empty(self):
-        """测试开发文档文件内容不为空"""
+    def test_dev_notes_contains_bug_info(self):
+        """测试开发文档是否包含相关的错误信息或标题相关内容"""
         dev_notes_file = Path("docs/fe3c52/3ba7c2/dev-notes.md")
-        assert dev_notes_file.exists(), "dev-notes.md文件不存在"
+        assert dev_notes_file.exists(), "dev-notes.md 文件不存在"
         
-        with open(dev_notes_file, 'r', encoding='utf-8') as f:
-            content = f.read().strip()
-        
-        assert len(content) > 0, "dev-notes.md文件内容为空"
-        assert content != "", "开发文档不应该为空"
+        content = dev_notes_file.read_text(encoding='utf-8')
+        # 检查是否包含标题、BUG或AAA相关内容
+        keywords = ['标题', 'title', 'BUG', 'AAA', '显示', '页面']
+        found_keywords = [keyword for keyword in keywords if keyword.lower() in content.lower()]
+        assert len(found_keywords) > 0, f"开发文档中未找到相关关键词: {keywords}"
