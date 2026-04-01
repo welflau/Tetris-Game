@@ -64,9 +64,9 @@
             background: linear-gradient(45deg, #ff6b6b, #ffd93d, #6bcf7f, #4ecdc4, #45b7d1);
             background-size: 400% 400%;
             -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: aaaGlow 3s ease-in-out infinite alternate, colorShift 5s ease-in-out infinite;
+            -webkit-text-fill-color: transparent;
+            animation: aaaGlow 3s ease-in-out infinite alternate, gradientShift 4s ease-in-out infinite;
         }
 
         @keyframes titleGlow {
@@ -79,11 +79,11 @@
             }
             to {
                 text-shadow: 
-                    0 0 15px #00ffff,
-                    0 0 25px #00ffff,
-                    0 0 35px #00ffff,
-                    0 0 45px #00ffff,
-                    0 0 55px #00ffff;
+                    0 0 20px #00ffff,
+                    0 0 30px #00ffff,
+                    0 0 40px #00ffff,
+                    0 0 50px #00ffff,
+                    0 0 60px #00ffff;
             }
         }
 
@@ -95,139 +95,427 @@
                     0 0 30px #ff6b6b,
                     0 0 40px #ff6b6b,
                     0 0 50px #ff6b6b;
-                filter: brightness(1);
-                transform: scale(1);
             }
             to {
                 text-shadow: 
-                    0 0 15px #ff6b6b,
-                    0 0 25px #ff6b6b,
-                    0 0 35px #ff6b6b,
-                    0 0 45px #ff6b6b,
-                    0 0 55px #ff6b6b,
-                    0 0 65px #ff6b6b;
-                filter: brightness(1.2);
-                transform: scale(1.02);
+                    0 0 20px #ff6b6b,
+                    0 0 30px #ff6b6b,
+                    0 0 40px #ff6b6b,
+                    0 0 50px #ff6b6b,
+                    0 0 60px #ff6b6b,
+                    0 0 70px #ff6b6b;
             }
         }
 
-        @keyframes colorShift {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        /* 响应式适配 */
+        /* 响应式设计 */
         @media (max-width: 768px) {
-            .aaa-title {
-                font-size: 2.5rem;
-                letter-spacing: 0.3rem;
-                text-shadow: 
-                    0 0 8px #ff6b6b,
-                    0 0 16px #ff6b6b,
-                    0 0 24px #ff6b6b,
-                    0 0 32px #ff6b6b;
-            }
-            
-            .game-title {
+            .game-title, .aaa-title {
                 font-size: 2.5rem;
                 letter-spacing: 0.3rem;
             }
         }
 
         @media (max-width: 480px) {
-            .aaa-title {
-                font-size: 2rem;
-                letter-spacing: 0.2rem;
-                text-shadow: 
-                    0 0 6px #ff6b6b,
-                    0 0 12px #ff6b6b,
-                    0 0 18px #ff6b6b,
-                    0 0 24px #ff6b6b;
-            }
-            
-            .game-title {
+            .game-title, .aaa-title {
                 font-size: 2rem;
                 letter-spacing: 0.2rem;
             }
-            
-            body {
-                padding: 10px;
-            }
         }
 
-        @media (max-width: 320px) {
-            .aaa-title {
-                font-size: 1.5rem;
-                letter-spacing: 0.1rem;
-                text-shadow: 
-                    0 0 4px #ff6b6b,
-                    0 0 8px #ff6b6b,
-                    0 0 12px #ff6b6b;
-            }
-            
-            .game-title {
-                font-size: 1.5rem;
-                letter-spacing: 0.1rem;
-            }
+        /* 测试面板样式 */
+        .test-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-width: 300px;
+            z-index: 1000;
+            display: none;
         }
 
-        /* 高分辨率屏幕适配 */
-        @media (min-width: 1200px) {
-            .aaa-title {
-                font-size: 5rem;
-                letter-spacing: 0.8rem;
-                text-shadow: 
-                    0 0 12px #ff6b6b,
-                    0 0 24px #ff6b6b,
-                    0 0 36px #ff6b6b,
-                    0 0 48px #ff6b6b,
-                    0 0 60px #ff6b6b;
-            }
-            
-            .game-title {
-                font-size: 5rem;
-                letter-spacing: 0.8rem;
-            }
+        .test-panel.active {
+            display: block;
         }
 
-        /* 暗色模式适配 */
-        @media (prefers-color-scheme: dark) {
-            .aaa-title {
-                text-shadow: 
-                    0 0 15px #ff6b6b,
-                    0 0 30px #ff6b6b,
-                    0 0 45px #ff6b6b,
-                    0 0 60px #ff6b6b;
-            }
+        .test-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 1001;
         }
 
-        /* 减少动画效果（用户偏好设置） */
-        @media (prefers-reduced-motion: reduce) {
-            .aaa-title {
-                animation: none;
-                text-shadow: 
-                    0 0 10px #ff6b6b,
-                    0 0 20px #ff6b6b,
-                    0 0 30px #ff6b6b;
-            }
-            
-            .game-title {
-                animation: none;
-            }
+        .test-button:hover {
+            background: #0056b3;
+        }
+
+        .test-result {
+            margin: 5px 0;
+            padding: 3px;
+            border-radius: 3px;
+        }
+
+        .test-pass {
+            background: rgba(40, 167, 69, 0.3);
+            color: #28a745;
+        }
+
+        .test-fail {
+            background: rgba(220, 53, 69, 0.3);
+            color: #dc3545;
+        }
+
+        .test-info {
+            background: rgba(23, 162, 184, 0.3);
+            color: #17a2b8;
+        }
+
+        /* 性能监控指示器 */
+        .performance-indicator {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 11px;
+            z-index: 1000;
+        }
+
+        .fps-counter {
+            color: #00ff00;
+        }
+
+        .render-time {
+            color: #ffff00;
         }
     </style>
 </head>
 <body>
     <div class="title-container">
-        <h1 class="aaa-title">AAA TETRIS</h1>
-        <h2 class="game-title">俄罗斯方块</h2>
+        <h1 class="game-title" id="gameTitle">俄罗斯方块</h1>
+        <h2 class="aaa-title" id="aaaTitle">AAA级游戏</h2>
     </div>
+
+    <!-- 测试控制面板 -->
+    <div class="test-panel" id="testPanel">
+        <h3>测试结果</h3>
+        <div id="testResults"></div>
+        <button onclick="runAllTests()">重新测试</button>
+    </div>
+
+    <!-- 测试按钮 -->
+    <button class="test-button" onclick="toggleTestPanel()">测试面板</button>
+
+    <!-- 性能监控 -->
+    <div class="performance-indicator" id="performanceIndicator">
+        <div class="fps-counter">FPS: <span id="fpsCounter">0</span></div>
+        <div class="render-time">渲染时间: <span id="renderTime">0</span>ms</div>
+        <div>浏览器: <span id="browserInfo"></span></div>
+        <div>屏幕: <span id="screenInfo"></span></div>
+    </div>
+
+    <script>
+        // 测试框架模块
+        class TestFramework {
+            constructor() {
+                this.testCases = [];
+                this.results = [];
+            }
+
+            addTestCase(name, testFunction) {
+                this.testCases.push({ name, testFunction });
+            }
+
+            async runTests() {
+                this.results = [];
+                for (const testCase of this.testCases) {
+                    try {
+                        const result = await testCase.testFunction();
+                        this.results.push({
+                            name: testCase.name,
+                            status: result ? 'pass' : 'fail',
+                            message: result === true ? '通过' : result || '失败'
+                        });
+                    } catch (error) {
+                        this.results.push({
+                            name: testCase.name,
+                            status: 'fail',
+                            message: error.message
+                        });
+                    }
+                }
+                this.generateReport();
+            }
+
+            generateReport() {
+                const resultsContainer = document.getElementById('testResults');
+                resultsContainer.innerHTML = '';
+                
+                this.results.forEach(result => {
+                    const div = document.createElement('div');
+                    div.className = `test-result test-${result.status}`;
+                    div.innerHTML = `<strong>${result.name}:</strong> ${result.message}`;
+                    resultsContainer.appendChild(div);
+                });
+            }
+        }
+
+        // 兼容性测试模块
+        class CompatibilityTester {
+            checkBrowserSupport() {
+                const features = {
+                    'CSS Grid': CSS.supports('display', 'grid'),
+                    'CSS Flexbox': CSS.supports('display', 'flex'),
+                    'CSS Animations': CSS.supports('animation', 'none'),
+                    'CSS Gradients': CSS.supports('background', 'linear-gradient(red, blue)'),
+                    'CSS Text Shadow': CSS.supports('text-shadow', '0 0 10px red'),
+                    'CSS Background Clip': CSS.supports('background-clip', 'text') || CSS.supports('-webkit-background-clip', 'text')
+                };
+
+                const unsupported = Object.entries(features)
+                    .filter(([feature, supported]) => !supported)
+                    .map(([feature]) => feature);
+
+                return unsupported.length === 0 ? true : `不支持的特性: ${unsupported.join(', ')}`;
+            }
+
+            testResponsiveLayout() {
+                const gameTitle = document.getElementById('gameTitle');
+                const aaaTitle = document.getElementById('aaaTitle');
+                
+                const originalWidth = window.innerWidth;
+                const titleRect = gameTitle.getBoundingClientRect();
+                
+                // 检查标题是否在视口内
+                const isVisible = titleRect.left >= 0 && 
+                                titleRect.right <= window.innerWidth &&
+                                titleRect.top >= 0 && 
+                                titleRect.bottom <= window.innerHeight;
+                
+                return isVisible ? true : '标题超出视口范围';
+            }
+
+            validateCSSProperties() {
+                const gameTitle = document.getElementById('gameTitle');
+                const computedStyle = window.getComputedStyle(gameTitle);
+                
+                const checks = {
+                    'font-size': parseFloat(computedStyle.fontSize) > 0,
+                    'color': computedStyle.color !== '',
+                    'text-shadow': computedStyle.textShadow !== 'none',
+                    'animation': computedStyle.animationName !== 'none'
+                };
+
+                const failed = Object.entries(checks)
+                    .filter(([prop, valid]) => !valid)
+                    .map(([prop]) => prop);
+
+                return failed.length === 0 ? true : `CSS属性异常: ${failed.join(', ')}`;
+            }
+        }
+
+        // 视觉回归测试模块
+        class VisualRegressionTester {
+            captureScreenshot() {
+                // 模拟截图功能（实际项目中需要使用专门的截图工具）
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                
+                // 这里只是模拟，实际需要html2canvas等库
+                return Promise.resolve('screenshot-captured');
+            }
+
+            compareVisuals() {
+                // 模拟视觉对比
+                const gameTitle = document.getElementById('gameTitle');
+                const aaaTitle = document.getElementById('aaaTitle');
+                
+                const titleStyles = window.getComputedStyle(gameTitle);
+                const aaaStyles = window.getComputedStyle(aaaTitle);
+                
+                // 检查关键样式属性
+                const checks = [
+                    titleStyles.fontSize !== '0px',
+                    titleStyles.color !== 'rgba(0, 0, 0, 0)',
+                    aaaStyles.fontSize !== '0px',
+                    aaaStyles.color !== 'rgba(0, 0, 0, 0)'
+                ];
+                
+                return checks.every(check => check) ? true : '视觉样式异常';
+            }
+
+            detectLayoutShift() {
+                const gameTitle = document.getElementById('gameTitle');
+                const initialRect = gameTitle.getBoundingClientRect();
+                
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        const currentRect = gameTitle.getBoundingClientRect();
+                        const shifted = Math.abs(initialRect.top - currentRect.top) > 1 ||
+                                      Math.abs(initialRect.left - currentRect.left) > 1;
+                        resolve(shifted ? '检测到布局偏移' : true);
+                    }, 1000);
+                });
+            }
+        }
+
+        // 性能监控模块
+        class PerformanceMonitor {
+            constructor() {
+                this.frameCount = 0;
+                this.lastTime = performance.now();
+                this.fps = 0;
+                this.renderTimes = [];
+            }
+
+            measureRenderTime() {
+                const start = performance.now();
+                
+                // 强制重绘
+                document.body.offsetHeight;
+                
+                const end = performance.now();
+                const renderTime = end - start;
+                
+                this.renderTimes.push(renderTime);
+                if (this.renderTimes.length > 60) {
+                    this.renderTimes.shift();
+                }
+                
+                const avgRenderTime = this.renderTimes.reduce((a, b) => a + b, 0) / this.renderTimes.length;
+                
+                return avgRenderTime < 16 ? true : `渲染时间过长: ${avgRenderTime.toFixed(2)}ms`;
+            }
+
+            checkAnimationPerformance() {
+                return new Promise(resolve => {
+                    let frameCount = 0;
+                    const startTime = performance.now();
+                    
+                    function countFrames() {
+                        frameCount++;
+                        if (performance.now() - startTime < 1000) {
+                            requestAnimationFrame(countFrames);
+                        } else {
+                            const fps = frameCount;
+                            resolve(fps >= 30 ? true : `FPS过低: ${fps}`);
+                        }
+                    }
+                    
+                    requestAnimationFrame(countFrames);
+                });
+            }
+
+            monitorLoadImpact() {
+                const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                return loadTime < 3000 ? true : `页面加载时间过长: ${loadTime}ms`;
+            }
+
+            startFPSMonitoring() {
+                const fpsCounter = document.getElementById('fpsCounter');
+                const renderTimeDisplay = document.getElementById('renderTime');
+                
+                const updateFPS = () => {
+                    const now = performance.now();
+                    this.frameCount++;
+                    
+                    if (now - this.lastTime >= 1000) {
+                        this.fps = Math.round((this.frameCount * 1000) / (now - this.lastTime));
+                        this.frameCount = 0;
+                        this.lastTime = now;
+                        
+                        fpsCounter.textContent = this.fps;
+                    }
+                    
+                    const renderStart = performance.now();
+                    document.body.offsetHeight; // 强制重绘
+                    const renderEnd = performance.now();
+                    renderTimeDisplay.textContent = (renderEnd - renderStart).toFixed(2);
+                    
+                    requestAnimationFrame(updateFPS);
+                };
+                
+                requestAnimationFrame(updateFPS);
+            }
+        }
+
+        // 初始化测试系统
+        const testFramework = new TestFramework();
+        const compatibilityTester = new CompatibilityTester();
+        const visualTester = new VisualRegressionTester();
+        const performanceMonitor = new PerformanceMonitor();
+
+        // 添加测试用例
+        testFramework.addTestCase('浏览器兼容性检查', () => compatibilityTester.checkBrowserSupport());
+        testFramework.addTestCase('响应式布局测试', () => compatibilityTester.testResponsiveLayout());
+        testFramework.addTestCase('CSS属性验证', () => compatibilityTester.validateCSSProperties());
+        testFramework.addTestCase('视觉样式检查', () => visualTester.compareVisuals());
+        testFramework.addTestCase('布局偏移检测', () => visualTester.detectLayoutShift());
+        testFramework.addTestCase('渲染性能测试', () => performanceMonitor.measureRenderTime());
+        testFramework.addTestCase('动画性能测试', () => performanceMonitor.checkAnimationPerformance());
+        testFramework.addTestCase('加载性能测试', () => performanceMonitor.monitorLoadImpact());
+
+        // 全局函数
+        function toggleTestPanel() {
+            const panel = document.getElementById('testPanel');
+            panel.classList.toggle('active');
+        }
+
+        function runAllTests() {
+            testFramework.runTests();
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('load', () => {
+            // 显示浏览器和屏幕信息
+            document.getElementById('browserInfo').textContent = navigator.userAgent.split(' ').pop();
+            document.getElementById('screenInfo').textContent = `${screen.width}x${screen.height}`;
+            
+            // 启动性能监控
+            performanceMonitor.startFPSMonitoring();
+            
+            // 自动运行测试
+            setTimeout(() => {
+                testFramework.runTests();
+            }, 1000);
+        });
+
+        // 响应式测试 - 监听窗口大小变化
+        window.addEventListener('resize', () => {
+            setTimeout(() => {
+                testFramework.addTestCase('窗口调整后响应式测试', () => compatibilityTester.testResponsiveLayout());
+            }, 500);
+        });
+
+        // 设备方向变化测试
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                testFramework.addTestCase('设备方向变化测试', () => compatibilityTester.testResponsiveLayout());
+                testFramework.runTests();
+            }, 1000);
+        });
+    </script>
 </body>
 </html>
