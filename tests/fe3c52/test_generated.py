@@ -41,21 +41,21 @@ class TestOtherModule:
         assert dev_notes_file.is_file(), "dev-notes.md 不是一个有效的文件"
     
     def test_dev_notes_contains_content(self):
-        """测试开发文档是否包含有效内容"""
+        """测试开发文档文件是否包含有效内容"""
         dev_notes_file = Path("docs/fe3c52/3ba7c2/dev-notes.md")
         assert dev_notes_file.exists(), "开发文档 dev-notes.md 文件不存在"
         
         content = dev_notes_file.read_text(encoding='utf-8')
         assert content.strip(), "开发文档内容为空"
-        assert len(content.strip()) > 10, "开发文档内容过短，可能不是有效的文档"
+        assert len(content.strip()) > 10, "开发文档内容过短，可能不完整"
     
     def test_html_basic_structure(self):
-        """测试 HTML 文件是否具有基本的 HTML 结构"""
+        """测试 HTML 文件是否包含基本的 HTML 结构元素"""
         index_file = Path("index.html")
         assert index_file.exists(), "index.html 文件不存在"
         
         content = index_file.read_text(encoding='utf-8')
-        # 检查基本的 HTML 结构
-        assert re.search(r'<html[^>]*>', content, re.IGNORECASE), "HTML 文件缺少 html 开始标签"
-        assert re.search(r'<head[^>]*>', content, re.IGNORECASE), "HTML 文件缺少 head 标签"
-        assert re.search(r'<body[^>]*>', content, re.IGNORECASE), "HTML 文件缺少 body 标签"
+        # 检查基本 HTML 结构
+        assert re.search(r'<html[^>]*>', content, re.IGNORECASE), "缺少 html 开始标签"
+        assert re.search(r'<head[^>]*>', content, re.IGNORECASE), "缺少 head 标签"
+        assert re.search(r'<body[^>]*>', content, re.IGNORECASE), "缺少 body 标签"
