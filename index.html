@@ -86,12 +86,24 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(0, 0, 0, 0.9);
-            border: 3px solid #ff0000;
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
             color: white;
-            z-index: 1000;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #ff6b6b;
+        }
+
+        .test-area {
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        .test-canvas {
+            background: #333;
+            border: 1px solid #fff;
+            margin: 5px;
         }
     </style>
 </head>
@@ -100,19 +112,23 @@
         <div class="game-board">
             <canvas id="gameCanvas" width="300" height="600"></canvas>
         </div>
+        
         <div class="game-info">
             <div class="info-section">
-                <h3>得分</h3>
+                <h3>分数</h3>
                 <div class="score" id="score">0</div>
             </div>
+            
             <div class="info-section">
                 <h3>等级</h3>
                 <div class="level" id="level">1</div>
             </div>
+            
             <div class="info-section">
                 <h3>消除行数</h3>
                 <div class="lines" id="lines">0</div>
             </div>
+            
             <div class="info-section">
                 <h3>操作说明</h3>
                 <div class="controls">
@@ -122,246 +138,231 @@
                     空格 暂停
                 </div>
             </div>
+
+            <div class="test-area">
+                <h3>方块测试</h3>
+                <canvas id="testCanvas" class="test-canvas" width="120" height="120"></canvas>
+                <button onclick="testBlocks()">测试方块</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // GameCanvas 模块 - 管理Canvas元素的创建、尺寸设置和基础渲染上下文
-        class GameCanvas {
-            constructor(canvasId) {
-                this.canvas = document.getElementById(canvasId);
-                this.ctx = this.canvas.getContext('2d');
-                this.init();
+        // Block基类
+        class Block {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.shape = [];
             }
 
-            init() {
-                // 设置Canvas尺寸
-                this.canvas.width = 300;
-                this.canvas.height = 600;
-                
-                // 设置渲染质量
-                this.ctx.imageSmoothingEnabled = false;
-            }
-
-            resize(width, height) {
-                this.canvas.width = width;
-                this.canvas.height = height;
-            }
-
-            getContext() {
-                return this.ctx;
-            }
-
-            clear() {
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            }
-        }
-
-        // GridSystem 模块 - 实现10x20网格系统，提供坐标转换和网格绘制功能
-        class GridSystem {
-            constructor(cols = 10, rows = 20, cellSize = 30) {
-                this.cols = cols;
-                this.rows = rows;
-                this.cellSize = cellSize;
-            }
-
-            drawGrid(ctx) {
-                ctx.strokeStyle = '#333';
+            draw(ctx, cellSize) {
+                ctx.fillStyle = this.color;
+                ctx.strokeStyle = '#fff';
                 ctx.lineWidth = 1;
-
-                // 绘制垂直线
-                for (let x = 0; x <= this.cols; x++) {
-                    const pixelX = x * this.cellSize;
-                    ctx.beginPath();
-                    ctx.moveTo(pixelX, 0);
-                    ctx.lineTo(pixelX, this.rows * this.cellSize);
-                    ctx.stroke();
-                }
-
-                // 绘制水平线
-                for (let y = 0; y <= this.rows; y++) {
-                    const pixelY = y * this.cellSize;
-                    ctx.beginPath();
-                    ctx.moveTo(0, pixelY);
-                    ctx.lineTo(this.cols * this.cellSize, pixelY);
-                    ctx.stroke();
-                }
-            }
-
-            gridToPixel(gridX, gridY) {
-                return {
-                    x: gridX * this.cellSize,
-                    y: gridY * this.cellSize
-                };
-            }
-
-            pixelToGrid(pixelX, pixelY) {
-                return {
-                    x: Math.floor(pixelX / this.cellSize),
-                    y: Math.floor(pixelY / this.cellSize)
-                };
-            }
-
-            isValidPosition(x, y) {
-                return x >= 0 && x < this.cols && y >= 0 && y < this.rows;
-            }
-        }
-
-        // GameState 模块 - 管理游戏状态数据，包括网格状态、当前方块位置等
-        class GameState {
-            constructor(cols = 10, rows = 20) {
-                this.cols = cols;
-                this.rows = rows;
-                this.grid = [];
-                this.score = 0;
-                this.level = 1;
-                this.lines = 0;
-                this.reset();
-            }
-
-            reset() {
-                // 初始化网格，0表示空，1表示有方块
-                this.grid = [];
-                for (let y = 0; y < this.rows; y++) {
-                    this.grid[y] = [];
-                    for (let x = 0; x < this.cols; x++) {
-                        this.grid[y][x] = 0;
-                    }
-                }
-                this.score = 0;
-                this.level = 1;
-                this.lines = 0;
-            }
-
-            getGrid() {
-                return this.grid;
-            }
-
-            setCell(x, y, value) {
-                if (this.isValidPosition(x, y)) {
-                    this.grid[y][x] = value;
-                }
-            }
-
-            getCell(x, y) {
-                if (this.isValidPosition(x, y)) {
-                    return this.grid[y][x];
-                }
-                return 1; // 边界外视为有方块
-            }
-
-            isValidPosition(x, y) {
-                return x >= 0 && x < this.cols && y >= 0 && y < this.rows;
-            }
-        }
-
-        // GameRenderer 模块 - 统一管理所有渲染操作，包括网格、方块和UI元素的绘制
-        class GameRenderer {
-            constructor(gameCanvas, gridSystem, gameState) {
-                this.canvas = gameCanvas;
-                this.ctx = gameCanvas.getContext();
-                this.gridSystem = gridSystem;
-                this.gameState = gameState;
-            }
-
-            render() {
-                this.canvas.clear();
-                this.renderGrid();
-                this.renderBlocks();
-                this.renderUI();
-            }
-
-            renderGrid() {
-                this.gridSystem.drawGrid(this.ctx);
-            }
-
-            renderBlocks() {
-                const grid = this.gameState.getGrid();
                 
-                for (let y = 0; y < this.gridSystem.rows; y++) {
-                    for (let x = 0; x < this.gridSystem.cols; x++) {
-                        if (grid[y][x] !== 0) {
-                            this.renderBlock(x, y, this.getBlockColor(grid[y][x]));
+                for (let row = 0; row < this.shape.length; row++) {
+                    for (let col = 0; col < this.shape[row].length; col++) {
+                        if (this.shape[row][col]) {
+                            const drawX = (this.x + col) * cellSize;
+                            const drawY = (this.y + row) * cellSize;
+                            
+                            // 绘制方块主体
+                            ctx.fillRect(drawX, drawY, cellSize, cellSize);
+                            
+                            // 绘制边框
+                            ctx.strokeRect(drawX, drawY, cellSize, cellSize);
+                            
+                            // 添加高光效果
+                            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                            ctx.fillRect(drawX, drawY, cellSize, 2);
+                            ctx.fillRect(drawX, drawY, 2, cellSize);
+                            
+                            // 恢复原色
+                            ctx.fillStyle = this.color;
                         }
                     }
                 }
             }
 
-            renderBlock(gridX, gridY, color = '#00ff00') {
-                const pixel = this.gridSystem.gridToPixel(gridX, gridY);
-                const size = this.gridSystem.cellSize;
-                
-                // 绘制方块主体
-                this.ctx.fillStyle = color;
-                this.ctx.fillRect(pixel.x + 1, pixel.y + 1, size - 2, size - 2);
-                
-                // 绘制方块边框
-                this.ctx.strokeStyle = '#fff';
-                this.ctx.lineWidth = 1;
-                this.ctx.strokeRect(pixel.x + 1, pixel.y + 1, size - 2, size - 2);
+            getShape() {
+                return this.shape;
             }
 
-            renderUI() {
-                // 更新UI显示
-                document.getElementById('score').textContent = this.gameState.score;
-                document.getElementById('level').textContent = this.gameState.level;
-                document.getElementById('lines').textContent = this.gameState.lines;
+            getPosition() {
+                return { x: this.x, y: this.y };
             }
 
-            getBlockColor(blockType) {
-                const colors = {
-                    1: '#ff0000', // 红色
-                    2: '#00ff00', // 绿色
-                    3: '#0000ff', // 蓝色
-                    4: '#ffff00', // 黄色
-                    5: '#ff00ff', // 紫色
-                    6: '#00ffff', // 青色
-                    7: '#ffa500'  // 橙色
-                };
-                return colors[blockType] || '#ffffff';
+            setPosition(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+
+            getColor() {
+                return this.color;
             }
         }
 
-        // 游戏主类
+        // I型方块类
+        class IBlock extends Block {
+            constructor(x, y) {
+                super(x, y, '#00ffff'); // 青色
+                this.shape = [
+                    [1, 1, 1, 1]
+                ];
+            }
+
+            getShape() {
+                return this.shape;
+            }
+
+            draw(ctx, cellSize) {
+                // 使用渐变色绘制I型方块
+                const gradient = ctx.createLinearGradient(0, 0, cellSize * 4, 0);
+                gradient.addColorStop(0, '#00ffff');
+                gradient.addColorStop(0.5, '#0099cc');
+                gradient.addColorStop(1, '#006699');
+                
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                
+                for (let row = 0; row < this.shape.length; row++) {
+                    for (let col = 0; col < this.shape[row].length; col++) {
+                        if (this.shape[row][col]) {
+                            const drawX = (this.x + col) * cellSize;
+                            const drawY = (this.y + row) * cellSize;
+                            
+                            // 绘制渐变方块
+                            ctx.fillStyle = gradient;
+                            ctx.fillRect(drawX, drawY, cellSize, cellSize);
+                            
+                            // 绘制边框
+                            ctx.strokeRect(drawX, drawY, cellSize, cellSize);
+                            
+                            // 添加特殊高光效果
+                            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                            ctx.fillRect(drawX, drawY, cellSize, 3);
+                            ctx.fillRect(drawX, drawY, 3, cellSize);
+                            
+                            // 添加内部阴影
+                            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                            ctx.fillRect(drawX + cellSize - 3, drawY, 3, cellSize);
+                            ctx.fillRect(drawX, drawY + cellSize - 3, cellSize, 3);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 方块工厂模块
+        class BlockFactory {
+            static createBlock(type, x, y) {
+                switch (type) {
+                    case 'I':
+                        return new IBlock(x, y);
+                    default:
+                        return new IBlock(x, y); // 默认返回I型方块
+                }
+            }
+
+            static getRandomBlock(x, y) {
+                const types = ['I']; // 目前只有I型方块
+                const randomType = types[Math.floor(Math.random() * types.length)];
+                return this.createBlock(randomType, x, y);
+            }
+        }
+
+        // 游戏主逻辑
         class TetrisGame {
             constructor() {
-                this.gameCanvas = new GameCanvas('gameCanvas');
-                this.gridSystem = new GridSystem(10, 20, 30);
-                this.gameState = new GameState(10, 20);
-                this.renderer = new GameRenderer(this.gameCanvas, this.gridSystem, this.gameState);
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.cellSize = 30;
+                this.rows = 20;
+                this.cols = 10;
                 
+                this.currentBlock = null;
                 this.init();
             }
 
             init() {
-                // 添加一些测试方块来验证渲染
-                this.gameState.setCell(1, 18, 1);
-                this.gameState.setCell(2, 18, 2);
-                this.gameState.setCell(3, 18, 3);
-                this.gameState.setCell(1, 19, 4);
-                this.gameState.setCell(2, 19, 5);
-                this.gameState.setCell(3, 19, 6);
-                
-                this.gameState.score = 1500;
-                this.gameState.level = 3;
-                this.gameState.lines = 15;
-                
-                this.startGameLoop();
+                this.spawnNewBlock();
+                this.render();
             }
 
-            startGameLoop() {
-                const gameLoop = () => {
-                    this.renderer.render();
-                    requestAnimationFrame(gameLoop);
-                };
-                gameLoop();
+            spawnNewBlock() {
+                this.currentBlock = BlockFactory.getRandomBlock(3, 0);
+            }
+
+            render() {
+                // 清空画布
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // 绘制网格
+                this.drawGrid();
+                
+                // 绘制当前方块
+                if (this.currentBlock) {
+                    this.currentBlock.draw(this.ctx, this.cellSize);
+                }
+            }
+
+            drawGrid() {
+                this.ctx.strokeStyle = '#333';
+                this.ctx.lineWidth = 1;
+                
+                // 绘制垂直线
+                for (let col = 0; col <= this.cols; col++) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(col * this.cellSize, 0);
+                    this.ctx.lineTo(col * this.cellSize, this.canvas.height);
+                    this.ctx.stroke();
+                }
+                
+                // 绘制水平线
+                for (let row = 0; row <= this.rows; row++) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, row * this.cellSize);
+                    this.ctx.lineTo(this.canvas.width, row * this.cellSize);
+                    this.ctx.stroke();
+                }
             }
         }
 
-        // 启动游戏
-        window.addEventListener('DOMContentLoaded', () => {
-            const game = new TetrisGame();
-        });
+        // 测试函数
+        function testBlocks() {
+            const testCanvas = document.getElementById('testCanvas');
+            const testCtx = testCanvas.getContext('2d');
+            const cellSize = 25;
+            
+            // 清空测试画布
+            testCtx.clearRect(0, 0, testCanvas.width, testCanvas.height);
+            
+            // 创建并绘制I型方块
+            const iBlock = BlockFactory.createBlock('I', 0, 1);
+            iBlock.draw(testCtx, cellSize);
+            
+            // 显示方块信息
+            testCtx.fillStyle = '#fff';
+            testCtx.font = '12px Arial';
+            testCtx.fillText('I型方块测试', 5, 15);
+            testCtx.fillText(`颜色: ${iBlock.getColor()}`, 5, 110);
+            
+            console.log('I型方块测试:');
+            console.log('形状矩阵:', iBlock.getShape());
+            console.log('位置:', iBlock.getPosition());
+            console.log('颜色:', iBlock.getColor());
+        }
+
+        // 初始化游戏
+        let game;
+        window.onload = function() {
+            game = new TetrisGame();
+            
+            // 自动测试方块
+            setTimeout(testBlocks, 500);
+        };
     </script>
 </body>
 </html>
