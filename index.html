@@ -84,178 +84,52 @@
             color: #4ecdc4;
         }
 
-        .next-piece {
-            width: 80px;
-            height: 80px;
-            background: #000;
-            border: 1px solid #fff;
-            border-radius: 5px;
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
             margin-top: 10px;
         }
 
-        .controls {
-            font-size: 12px;
-            line-height: 1.4;
+        .controls h4 {
+            margin-bottom: 10px;
+            color: #ffd700;
         }
 
-        .control-buttons {
-            display: none;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .control-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid #fff;
-            border-radius: 5px;
-            color: white;
-            padding: 10px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .control-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .control-btn:active {
-            background: rgba(255, 255, 255, 0.4);
-        }
-
-        .game-over {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            border: 3px solid #ff6b6b;
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-            z-index: 1000;
-            display: none;
-        }
-
-        .game-over h2 {
-            color: #ff6b6b;
-            margin-bottom: 20px;
-            font-size: 28px;
-        }
-
-        .game-over p {
-            margin-bottom: 20px;
-            font-size: 16px;
-        }
-
-        .restart-btn {
-            background: #4ecdc4;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            padding: 12px 24px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .restart-btn:hover {
-            background: #45b7aa;
+        .control-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
         }
 
         .game-status {
             text-align: center;
-            font-size: 14px;
+            font-size: 18px;
+            font-weight: bold;
             color: #ffd700;
             margin-bottom: 10px;
         }
 
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .game-container {
-                flex-direction: column;
-                align-items: center;
-                gap: 15px;
-                padding: 5px;
-            }
-
-            .game-info {
-                min-width: auto;
-                width: 100%;
-                max-width: 300px;
-                padding: 15px;
-                flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: space-between;
-            }
-
-            .info-section {
-                margin-bottom: 10px;
-                flex: 1;
-                min-width: 120px;
-            }
-
-            .next-piece {
-                width: 60px;
-                height: 60px;
-            }
-
-            .control-buttons {
-                display: grid;
-                width: 100%;
-                margin-top: 10px;
-            }
-
-            .controls {
-                display: none;
-            }
-
-            .score {
-                font-size: 20px;
-            }
-
-            .level {
-                font-size: 16px;
-            }
-
-            .lines {
-                font-size: 14px;
-            }
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px 0;
+            transition: all 0.3s ease;
         }
 
-        @media (max-width: 480px) {
-            .game-info {
-                flex-direction: column;
-            }
-
-            .info-section {
-                text-align: center;
-            }
-
-            .game-over {
-                width: 90%;
-                padding: 20px;
-            }
-
-            .game-over h2 {
-                font-size: 24px;
-            }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
 
-        @media (max-height: 600px) {
-            body {
-                align-items: flex-start;
-                padding-top: 10px;
-            }
-
-            .game-container {
-                gap: 10px;
-            }
-
-            .game-info {
-                padding: 10px;
-            }
+        .btn:active {
+            transform: translateY(0);
         }
     </style>
 </head>
@@ -264,9 +138,10 @@
         <div class="game-board">
             <canvas id="gameCanvas" width="300" height="600"></canvas>
         </div>
-        
         <div class="game-info">
             <div class="game-status" id="gameStatus">准备开始</div>
+            <button class="btn" id="startBtn" onclick="game.start()">开始游戏</button>
+            <button class="btn" id="pauseBtn" onclick="game.pause()" style="display:none;">暂停</button>
             
             <div class="info-section">
                 <h3>得分</h3>
@@ -283,466 +158,546 @@
                 <div class="lines" id="lines">0</div>
             </div>
             
-            <div class="info-section">
-                <h3>下一个</h3>
-                <canvas class="next-piece" id="nextCanvas" width="80" height="80"></canvas>
-            </div>
-            
-            <div class="info-section controls">
-                <h3>操作</h3>
-                <div>
-                    ← → 移动<br>
-                    ↓ 加速下落<br>
-                    ↑ 旋转<br>
-                    空格 暂停<br>
-                    R 重新开始
+            <div class="controls">
+                <h4>操作说明</h4>
+                <div class="control-item">
+                    <span>左移:</span>
+                    <span>← 或 A</span>
                 </div>
-            </div>
-            
-            <div class="control-buttons">
-                <button class="control-btn" data-action="rotate">旋转</button>
-                <button class="control-btn" data-action="pause">暂停</button>
-                <button class="control-btn" data-action="restart">重启</button>
-                <button class="control-btn" data-action="left">←</button>
-                <button class="control-btn" data-action="down">↓</button>
-                <button class="control-btn" data-action="right">→</button>
+                <div class="control-item">
+                    <span>右移:</span>
+                    <span>→ 或 D</span>
+                </div>
+                <div class="control-item">
+                    <span>下降:</span>
+                    <span>↓ 或 S</span>
+                </div>
+                <div class="control-item">
+                    <span>旋转:</span>
+                    <span>↑ 或 W</span>
+                </div>
+                <div class="control-item">
+                    <span>快速下落:</span>
+                    <span>空格</span>
+                </div>
+                <div class="control-item">
+                    <span>暂停:</span>
+                    <span>P</span>
+                </div>
             </div>
         </div>
     </div>
-    
-    <div class="game-over" id="gameOverModal">
-        <h2>游戏结束</h2>
-        <p>最终得分: <span id="finalScore">0</span></p>
-        <p>消除行数: <span id="finalLines">0</span></p>
-        <button class="restart-btn" onclick="gameManager.restart()">重新开始</button>
-    </div>
 
     <script>
-        // UIManager - 管理游戏界面状态和信息显示
-        class UIManager {
+        // 时间管理器
+        class TimeManager {
             constructor() {
-                this.scoreElement = document.getElementById('score');
-                this.levelElement = document.getElementById('level');
-                this.linesElement = document.getElementById('lines');
-                this.statusElement = document.getElementById('gameStatus');
-                this.gameOverModal = document.getElementById('gameOverModal');
-                this.finalScoreElement = document.getElementById('finalScore');
-                this.finalLinesElement = document.getElementById('finalLines');
-                this.nextCanvas = document.getElementById('nextCanvas');
-                this.nextCtx = this.nextCanvas.getContext('2d');
-                
-                this.currentScore = 0;
-                this.currentLevel = 1;
-                this.currentLines = 0;
-                this.gameStatus = 'ready';
+                this.lastTime = 0;
+                this.deltaTime = 0;
+                this.gameTime = 0;
             }
 
-            updateScore(score) {
-                this.currentScore = score;
-                this.scoreElement.textContent = score.toLocaleString();
+            updateTime() {
+                const currentTime = performance.now();
+                this.deltaTime = currentTime - this.lastTime;
+                this.lastTime = currentTime;
+                this.gameTime += this.deltaTime;
             }
 
-            updateLevel(level) {
-                this.currentLevel = level;
-                this.levelElement.textContent = level;
+            getDeltaTime() {
+                return this.deltaTime;
             }
 
-            updateLines(lines) {
-                this.currentLines = lines;
-                this.linesElement.textContent = lines;
+            getGameTime() {
+                return this.gameTime;
             }
 
-            showNextPiece(piece) {
-                this.nextCtx.clearRect(0, 0, this.nextCanvas.width, this.nextCanvas.height);
-                
-                if (!piece) return;
-                
-                const blockSize = 15;
-                const offsetX = (this.nextCanvas.width - piece.shape[0].length * blockSize) / 2;
-                const offsetY = (this.nextCanvas.height - piece.shape.length * blockSize) / 2;
-                
-                this.nextCtx.fillStyle = piece.color || '#fff';
-                
-                for (let row = 0; row < piece.shape.length; row++) {
-                    for (let col = 0; col < piece.shape[row].length; col++) {
-                        if (piece.shape[row][col]) {
-                            this.nextCtx.fillRect(
-                                offsetX + col * blockSize,
-                                offsetY + row * blockSize,
-                                blockSize - 1,
-                                blockSize - 1
-                            );
-                        }
-                    }
-                }
-            }
-
-            updateGameStatus(status) {
-                this.gameStatus = status;
-                const statusTexts = {
-                    'ready': '准备开始',
-                    'playing': '游戏进行中',
-                    'paused': '游戏暂停',
-                    'gameOver': '游戏结束'
-                };
-                this.statusElement.textContent = statusTexts[status] || status;
-            }
-
-            showGameOver() {
-                this.finalScoreElement.textContent = this.currentScore.toLocaleString();
-                this.finalLinesElement.textContent = this.currentLines;
-                this.gameOverModal.style.display = 'block';
-            }
-
-            hideGameOver() {
-                this.gameOverModal.style.display = 'none';
-            }
-
-            handleResize() {
-                // 响应式布局处理在ResponsiveLayout中实现
-                responsiveLayout.adjustLayout();
+            reset() {
+                this.lastTime = performance.now();
+                this.deltaTime = 0;
+                this.gameTime = 0;
             }
         }
 
-        // ResponsiveLayout - 处理响应式布局和Canvas尺寸调整
-        class ResponsiveLayout {
+        // 动画控制器
+        class AnimationController {
             constructor() {
-                this.gameCanvas = document.getElementById('gameCanvas');
-                this.gameContainer = document.querySelector('.game-container');
-                this.originalCanvasWidth = 300;
-                this.originalCanvasHeight = 600;
-                
-                this.bindResizeEvent();
-                this.adjustLayout();
-            }
-
-            bindResizeEvent() {
-                window.addEventListener('resize', () => {
-                    this.adjustLayout();
-                });
-            }
-
-            calculateOptimalSize() {
-                const viewportWidth = window.innerWidth;
-                const viewportHeight = window.innerHeight;
-                const isMobile = viewportWidth <= 768;
-                
-                let canvasWidth, canvasHeight;
-                
-                if (isMobile) {
-                    // 移动端：优先考虑宽度适配
-                    const maxWidth = Math.min(viewportWidth - 40, 280);
-                    canvasWidth = maxWidth;
-                    canvasHeight = maxWidth * 2; // 保持2:1比例
-                    
-                    // 检查高度是否超出
-                    const maxHeight = viewportHeight - 200; // 留出UI空间
-                    if (canvasHeight > maxHeight) {
-                        canvasHeight = maxHeight;
-                        canvasWidth = canvasHeight / 2;
-                    }
-                } else {
-                    // 桌面端：使用原始尺寸或根据视口调整
-                    const maxHeight = viewportHeight - 100;
-                    const maxWidth = (viewportWidth - 300) * 0.8; // 留出信息面板空间
-                    
-                    canvasHeight = Math.min(this.originalCanvasHeight, maxHeight);
-                    canvasWidth = Math.min(this.originalCanvasWidth, maxWidth, canvasHeight / 2);
-                    
-                    // 保持比例
-                    if (canvasWidth * 2 > canvasHeight) {
-                        canvasWidth = canvasHeight / 2;
-                    } else {
-                        canvasHeight = canvasWidth * 2;
-                    }
-                }
-                
-                return {
-                    width: Math.floor(canvasWidth),
-                    height: Math.floor(canvasHeight)
-                };
-            }
-
-            adjustLayout() {
-                const optimalSize = this.calculateOptimalSize();
-                this.updateCanvasSize(optimalSize.width, optimalSize.height);
-                
-                // 触发游戏重绘
-                if (window.gameManager && window.gameManager.renderer) {
-                    window.gameManager.renderer.updateCanvasSize(optimalSize.width, optimalSize.height);
-                }
-            }
-
-            updateCanvasSize(width, height) {
-                this.gameCanvas.width = width;
-                this.gameCanvas.height = height;
-                this.gameCanvas.style.width = width + 'px';
-                this.gameCanvas.style.height = height + 'px';
-            }
-        }
-
-        // GameControls - 处理游戏控制和输入
-        class GameControls {
-            constructor(gameManager) {
-                this.gameManager = gameManager;
-                this.keyPressed = {};
-                this.touchStartX = 0;
-                this.touchStartY = 0;
-                this.minSwipeDistance = 30;
-                
-                this.bindKeyboardEvents();
-                this.bindTouchEvents();
-                this.bindButtonEvents();
-            }
-
-            bindKeyboardEvents() {
-                document.addEventListener('keydown', (e) => {
-                    if (this.keyPressed[e.code]) return;
-                    this.keyPressed[e.code] = true;
-                    
-                    switch(e.code) {
-                        case 'ArrowLeft':
-                            e.preventDefault();
-                            this.handleGameAction('left');
-                            break;
-                        case 'ArrowRight':
-                            e.preventDefault();
-                            this.handleGameAction('right');
-                            break;
-                        case 'ArrowDown':
-                            e.preventDefault();
-                            this.handleGameAction('down');
-                            break;
-                        case 'ArrowUp':
-                            e.preventDefault();
-                            this.handleGameAction('rotate');
-                            break;
-                        case 'Space':
-                            e.preventDefault();
-                            this.handleGameAction('pause');
-                            break;
-                        case 'KeyR':
-                            e.preventDefault();
-                            this.handleGameAction('restart');
-                            break;
-                    }
-                });
-                
-                document.addEventListener('keyup', (e) => {
-                    this.keyPressed[e.code] = false;
-                });
-            }
-
-            bindTouchEvents() {
-                this.gameCanvas = document.getElementById('gameCanvas');
-                
-                this.gameCanvas.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    const touch = e.touches[0];
-                    this.touchStartX = touch.clientX;
-                    this.touchStartY = touch.clientY;
-                });
-                
-                this.gameCanvas.addEventListener('touchmove', (e) => {
-                    e.preventDefault();
-                });
-                
-                this.gameCanvas.addEventListener('touchend', (e) => {
-                    e.preventDefault();
-                    const touch = e.changedTouches[0];
-                    const deltaX = touch.clientX - this.touchStartX;
-                    const deltaY = touch.clientY - this.touchStartY;
-                    
-                    const absX = Math.abs(deltaX);
-                    const absY = Math.abs(deltaY);
-                    
-                    if (absX < this.minSwipeDistance && absY < this.minSwipeDistance) {
-                        // 点击 - 旋转
-                        this.handleGameAction('rotate');
-                        return;
-                    }
-                    
-                    if (absX > absY) {
-                        // 水平滑动
-                        if (deltaX > 0) {
-                            this.handleGameAction('right');
-                        } else {
-                            this.handleGameAction('left');
-                        }
-                    } else {
-                        // 垂直滑动
-                        if (deltaY > 0) {
-                            this.handleGameAction('down');
-                        }
-                    }
-                });
-            }
-
-            bindButtonEvents() {
-                const buttons = document.querySelectorAll('.control-btn');
-                buttons.forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const action = button.getAttribute('data-action');
-                        this.handleGameAction(action);
-                    });
-                });
-            }
-
-            handleGameAction(action) {
-                if (!this.gameManager) return;
-                
-                switch(action) {
-                    case 'left':
-                        this.gameManager.movePiece(-1, 0);
-                        break;
-                    case 'right':
-                        this.gameManager.movePiece(1, 0);
-                        break;
-                    case 'down':
-                        this.gameManager.movePiece(0, 1);
-                        break;
-                    case 'rotate':
-                        this.gameManager.rotatePiece();
-                        break;
-                    case 'pause':
-                        this.gameManager.togglePause();
-                        break;
-                    case 'restart':
-                        this.gameManager.restart();
-                        break;
-                }
-            }
-        }
-
-        // 简单的游戏管理器示例（用于演示UI功能）
-        class GameManager {
-            constructor() {
-                this.score = 0;
-                this.level = 1;
-                this.lines = 0;
-                this.isPlaying = false;
+                this.isRunning = false;
                 this.isPaused = false;
-                
-                // 示例下一个方块数据
-                this.nextPiece = {
-                    shape: [
-                        [1, 1],
-                        [1, 1]
-                    ],
-                    color: '#ff6b6b'
-                };
+                this.fps = 60;
+                this.frameInterval = 1000 / this.fps;
+                this.animationId = null;
+                this.callbacks = [];
             }
 
             start() {
-                this.isPlaying = true;
+                if (this.isRunning) return;
+                this.isRunning = true;
                 this.isPaused = false;
-                uiManager.updateGameStatus('playing');
-                uiManager.hideGameOver();
-                uiManager.showNextPiece(this.nextPiece);
+                this.loop();
+            }
+
+            stop() {
+                this.isRunning = false;
+                this.isPaused = false;
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
             }
 
             pause() {
-                this.isPaused = true;
-                uiManager.updateGameStatus('paused');
+                this.isPaused = !this.isPaused;
             }
 
             resume() {
                 this.isPaused = false;
-                uiManager.updateGameStatus('playing');
             }
 
-            togglePause() {
-                if (!this.isPlaying) {
-                    this.start();
-                    return;
+            setFPS(fps) {
+                this.fps = fps;
+                this.frameInterval = 1000 / fps;
+            }
+
+            addCallback(callback) {
+                this.callbacks.push(callback);
+            }
+
+            removeCallback(callback) {
+                const index = this.callbacks.indexOf(callback);
+                if (index > -1) {
+                    this.callbacks.splice(index, 1);
                 }
+            }
+
+            loop() {
+                if (!this.isRunning) return;
+
+                this.animationId = requestAnimationFrame(() => this.loop());
+
+                if (this.isPaused) return;
+
+                // 执行所有回调
+                this.callbacks.forEach(callback => {
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                });
+            }
+        }
+
+        // 方块下落系统
+        class FallSystem {
+            constructor(gameLoop) {
+                this.gameLoop = gameLoop;
+                this.fallSpeed = 1000; // 毫秒
+                this.lastFallTime = 0;
+                this.isActive = false;
+                this.speedMultiplier = 1;
+            }
+
+            startFalling() {
+                this.isActive = true;
+                this.lastFallTime = performance.now();
+            }
+
+            stopFalling() {
+                this.isActive = false;
+            }
+
+            setFallSpeed(speed) {
+                this.fallSpeed = speed;
+            }
+
+            setSpeedMultiplier(multiplier) {
+                this.speedMultiplier = multiplier;
+            }
+
+            update(currentTime) {
+                if (!this.isActive) return;
+
+                const actualFallSpeed = this.fallSpeed / this.speedMultiplier;
+                if (currentTime - this.lastFallTime >= actualFallSpeed) {
+                    this.forceDrop();
+                    this.lastFallTime = currentTime;
+                }
+            }
+
+            forceDrop() {
+                if (this.gameLoop && this.gameLoop.currentPiece) {
+                    this.gameLoop.movePiece(0, 1);
+                }
+            }
+        }
+
+        // 方块类
+        class Piece {
+            constructor(shape, color, x = 0, y = 0) {
+                this.shape = shape;
+                this.color = color;
+                this.x = x;
+                this.y = y;
+            }
+
+            rotate() {
+                const rotated = [];
+                const size = this.shape.length;
+                for (let i = 0; i < size; i++) {
+                    rotated[i] = [];
+                    for (let j = 0; j < size; j++) {
+                        rotated[i][j] = this.shape[size - 1 - j][i];
+                    }
+                }
+                this.shape = rotated;
+            }
+
+            clone() {
+                return new Piece(
+                    this.shape.map(row => [...row]),
+                    this.color,
+                    this.x,
+                    this.y
+                );
+            }
+        }
+
+        // 游戏主循环
+        class GameLoop {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.gridWidth = 10;
+                this.gridHeight = 20;
+                this.cellSize = 30;
+                this.grid = [];
+                this.currentPiece = null;
+                this.score = 0;
+                this.level = 1;
+                this.lines = 0;
+                this.gameState = 'ready'; // ready, playing, paused, gameOver
                 
-                if (this.isPaused) {
-                    this.resume();
-                } else {
-                    this.pause();
+                this.timeManager = new TimeManager();
+                this.animationController = new AnimationController();
+                this.fallSystem = new FallSystem(this);
+                
+                this.initGrid();
+                this.initPieces();
+                this.setupEventListeners();
+                
+                // 绑定游戏循环到动画控制器
+                this.animationController.addCallback(() => this.update());
+            }
+
+            initGrid() {
+                this.grid = [];
+                for (let y = 0; y < this.gridHeight; y++) {
+                    this.grid[y] = [];
+                    for (let x = 0; x < this.gridWidth; x++) {
+                        this.grid[y][x] = 0;
+                    }
+                }
+            }
+
+            initPieces() {
+                this.pieces = [
+                    { shape: [[1,1,1,1]], color: '#00ffff' }, // I
+                    { shape: [[1,1],[1,1]], color: '#ffff00' }, // O
+                    { shape: [[0,1,0],[1,1,1]], color: '#800080' }, // T
+                    { shape: [[0,1,1],[1,1,0]], color: '#00ff00' }, // S
+                    { shape: [[1,1,0],[0,1,1]], color: '#ff0000' }, // Z
+                    { shape: [[1,0,0],[1,1,1]], color: '#ffa500' }, // L
+                    { shape: [[0,0,1],[1,1,1]], color: '#0000ff' }  // J
+                ];
+            }
+
+            setupEventListeners() {
+                document.addEventListener('keydown', (e) => this.handleKeyPress(e));
+            }
+
+            handleKeyPress(e) {
+                if (this.gameState !== 'playing') return;
+
+                switch(e.key.toLowerCase()) {
+                    case 'arrowleft':
+                    case 'a':
+                        this.movePiece(-1, 0);
+                        break;
+                    case 'arrowright':
+                    case 'd':
+                        this.movePiece(1, 0);
+                        break;
+                    case 'arrowdown':
+                    case 's':
+                        this.fallSystem.setSpeedMultiplier(5);
+                        break;
+                    case 'arrowup':
+                    case 'w':
+                        this.rotatePiece();
+                        break;
+                    case ' ':
+                        this.hardDrop();
+                        break;
+                    case 'p':
+                        this.pause();
+                        break;
+                }
+                e.preventDefault();
+            }
+
+            start() {
+                this.gameState = 'playing';
+                this.initGrid();
+                this.score = 0;
+                this.level = 1;
+                this.lines = 0;
+                this.spawnPiece();
+                this.timeManager.reset();
+                this.fallSystem.startFalling();
+                this.animationController.start();
+                this.updateUI();
+                this.updateGameStatus('游戏进行中');
+                
+                document.getElementById('startBtn').style.display = 'none';
+                document.getElementById('pauseBtn').style.display = 'inline-block';
+            }
+
+            pause() {
+                if (this.gameState === 'playing') {
+                    this.gameState = 'paused';
+                    this.animationController.pause();
+                    this.updateGameStatus('游戏暂停');
+                    document.getElementById('pauseBtn').textContent = '继续';
+                } else if (this.gameState === 'paused') {
+                    this.gameState = 'playing';
+                    this.animationController.resume();
+                    this.updateGameStatus('游戏进行中');
+                    document.getElementById('pauseBtn').textContent = '暂停';
                 }
             }
 
             gameOver() {
-                this.isPlaying = false;
-                this.isPaused = false;
-                uiManager.updateGameStatus('gameOver');
-                uiManager.showGameOver();
+                this.gameState = 'gameOver';
+                this.animationController.stop();
+                this.fallSystem.stopFalling();
+                this.updateGameStatus('游戏结束');
+                
+                document.getElementById('startBtn').style.display = 'inline-block';
+                document.getElementById('startBtn').textContent = '重新开始';
+                document.getElementById('pauseBtn').style.display = 'none';
             }
 
-            restart() {
-                this.score = 0;
-                this.level = 1;
-                this.lines = 0;
-                
-                uiManager.updateScore(this.score);
-                uiManager.updateLevel(this.level);
-                uiManager.updateLines(this.lines);
-                
-                this.start();
-            }
+            spawnPiece() {
+                const pieceData = this.pieces[Math.floor(Math.random() * this.pieces.length)];
+                this.currentPiece = new Piece(
+                    pieceData.shape.map(row => [...row]),
+                    pieceData.color,
+                    Math.floor(this.gridWidth / 2) - 1,
+                    0
+                );
 
-            addScore(points) {
-                this.score += points;
-                uiManager.updateScore(this.score);
-                
-                // 每1000分升一级
-                const newLevel = Math.floor(this.score / 1000) + 1;
-                if (newLevel !== this.level) {
-                    this.level = newLevel;
-                    uiManager.updateLevel(this.level);
+                if (this.isCollision(this.currentPiece)) {
+                    this.gameOver();
                 }
             }
 
-            addLines(count) {
-                this.lines += count;
-                uiManager.updateLines(this.lines);
-                
-                // 根据消除行数加分
-                const lineScores = [0, 100, 300, 500, 800];
-                this.addScore(lineScores[count] * this.level);
-            }
-
-            // 示例移动方法（实际游戏逻辑需要在游戏引擎中实现）
             movePiece(dx, dy) {
-                if (!this.isPlaying || this.isPaused) return;
-                console.log(`移动方块: dx=${dx}, dy=${dy}`);
+                if (!this.currentPiece) return false;
+
+                const newPiece = this.currentPiece.clone();
+                newPiece.x += dx;
+                newPiece.y += dy;
+
+                if (!this.isCollision(newPiece)) {
+                    this.currentPiece = newPiece;
+                    return true;
+                } else if (dy > 0) {
+                    // 方块无法继续下落，固定到网格
+                    this.placePiece();
+                    this.clearLines();
+                    this.spawnPiece();
+                    this.fallSystem.setSpeedMultiplier(1); // 重置下落速度
+                }
+                return false;
             }
 
             rotatePiece() {
-                if (!this.isPlaying || this.isPaused) return;
-                console.log('旋转方块');
+                if (!this.currentPiece) return;
+
+                const rotatedPiece = this.currentPiece.clone();
+                rotatedPiece.rotate();
+
+                if (!this.isCollision(rotatedPiece)) {
+                    this.currentPiece = rotatedPiece;
+                }
+            }
+
+            hardDrop() {
+                if (!this.currentPiece) return;
+
+                while (this.movePiece(0, 1)) {
+                    // 继续下落直到碰撞
+                }
+            }
+
+            isCollision(piece) {
+                for (let y = 0; y < piece.shape.length; y++) {
+                    for (let x = 0; x < piece.shape[y].length; x++) {
+                        if (piece.shape[y][x]) {
+                            const newX = piece.x + x;
+                            const newY = piece.y + y;
+
+                            if (newX < 0 || newX >= this.gridWidth || 
+                                newY >= this.gridHeight || 
+                                (newY >= 0 && this.grid[newY][newX])) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+
+            placePiece() {
+                if (!this.currentPiece) return;
+
+                for (let y = 0; y < this.currentPiece.shape.length; y++) {
+                    for (let x = 0; x < this.currentPiece.shape[y].length; x++) {
+                        if (this.currentPiece.shape[y][x]) {
+                            const gridX = this.currentPiece.x + x;
+                            const gridY = this.currentPiece.y + y;
+                            if (gridY >= 0) {
+                                this.grid[gridY][gridX] = this.currentPiece.color;
+                            }
+                        }
+                    }
+                }
+            }
+
+            clearLines() {
+                let linesCleared = 0;
+                for (let y = this.gridHeight - 1; y >= 0; y--) {
+                    if (this.grid[y].every(cell => cell !== 0)) {
+                        this.grid.splice(y, 1);
+                        this.grid.unshift(new Array(this.gridWidth).fill(0));
+                        linesCleared++;
+                        y++; // 重新检查同一行
+                    }
+                }
+
+                if (linesCleared > 0) {
+                    this.lines += linesCleared;
+                    this.score += linesCleared * 100 * this.level;
+                    this.level = Math.floor(this.lines / 10) + 1;
+                    
+                    // 根据等级调整下落速度
+                    const newSpeed = Math.max(100, 1000 - (this.level - 1) * 100);
+                    this.fallSystem.setFallSpeed(newSpeed);
+                    
+                    this.updateUI();
+                }
+            }
+
+            update() {
+                if (this.gameState !== 'playing') return;
+
+                this.timeManager.updateTime();
+                this.fallSystem.update(this.timeManager.getGameTime());
+                this.render();
+            }
+
+            render() {
+                // 清空画布
+                this.ctx.fillStyle = '#000';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // 绘制网格
+                this.drawGrid();
+
+                // 绘制已放置的方块
+                this.drawPlacedPieces();
+
+                // 绘制当前方块
+                if (this.currentPiece) {
+                    this.drawPiece(this.currentPiece);
+                }
+            }
+
+            drawGrid() {
+                this.ctx.strokeStyle = '#333';
+                this.ctx.lineWidth = 1;
+                
+                for (let x = 0; x <= this.gridWidth; x++) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x * this.cellSize, 0);
+                    this.ctx.lineTo(x * this.cellSize, this.gridHeight * this.cellSize);
+                    this.ctx.stroke();
+                }
+                
+                for (let y = 0; y <= this.gridHeight; y++) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, y * this.cellSize);
+                    this.ctx.lineTo(this.gridWidth * this.cellSize, y * this.cellSize);
+                    this.ctx.stroke();
+                }
+            }
+
+            drawPlacedPieces() {
+                for (let y = 0; y < this.gridHeight; y++) {
+                    for (let x = 0; x < this.gridWidth; x++) {
+                        if (this.grid[y][x]) {
+                            this.drawCell(x, y, this.grid[y][x]);
+                        }
+                    }
+                }
+            }
+
+            drawPiece(piece) {
+                for (let y = 0; y < piece.shape.length; y++) {
+                    for (let x = 0; x < piece.shape[y].length; x++) {
+                        if (piece.shape[y][x]) {
+                            this.drawCell(piece.x + x, piece.y + y, piece.color);
+                        }
+                    }
+                }
+            }
+
+            drawCell(x, y, color) {
+                const pixelX = x * this.cellSize;
+                const pixelY = y * this.cellSize;
+                
+                this.ctx.fillStyle = color;
+                this.ctx.fillRect(pixelX + 1, pixelY + 1, this.cellSize - 2, this.cellSize - 2);
+                
+                // 添加高光效果
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                this.ctx.fillRect(pixelX + 1, pixelY + 1, this.cellSize - 2, 4);
+                this.ctx.fillRect(pixelX + 1, pixelY + 1, 4, this.cellSize - 2);
+            }
+
+            updateUI() {
+                document.getElementById('score').textContent = this.score;
+                document.getElementById('level').textContent = this.level;
+                document.getElementById('lines').textContent = this.lines;
+            }
+
+            updateGameStatus(status) {
+                document.getElementById('gameStatus').textContent = status;
             }
         }
 
-        // 初始化所有组件
-        const uiManager = new UIManager();
-        const responsiveLayout = new ResponsiveLayout();
-        const gameManager = new GameManager();
-        const gameControls = new GameControls(gameManager);
-
-        // 将gameManager设为全局变量，供其他模块使用
-        window.gameManager = gameManager;
-
-        // 初始化UI
-        uiManager.updateScore(0);
-        uiManager.updateLevel(1);
-        uiManager.updateLines(0);
-        uiManager.updateGameStatus('ready');
-        uiManager.showNextPiece(gameManager.nextPiece);
-
-        // 演示功能（可删除）
-        setTimeout(() => {
-            gameManager.addScore(150);
-            gameManager.addLines(1);
-        }, 2000);
-
-        setTimeout(() => {
-            gameManager.addScore(850);
-            gameManager.addLines(3);
-        }, 4000);
+        // 初始化游戏
+        let game;
+        window.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('gameCanvas');
+            game = new GameLoop(canvas);
+            
+            // 监听键盘事件释放
+            document.addEventListener('keyup', (e) => {
+                if (e.key.toLowerCase() === 'arrowdown' || e.key.toLowerCase() === 's') {
+                    game.fallSystem.setSpeedMultiplier(1);
+                }
+            });
+        });
     </script>
 </body>
 </html>
