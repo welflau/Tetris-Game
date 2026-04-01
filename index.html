@@ -84,46 +84,79 @@
             color: #4ecdc4;
         }
 
+        .fps {
+            font-size: 14px;
+            color: #ffd700;
+        }
+
+        .game-status {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .status-running {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+        }
+
+        .status-paused {
+            background: rgba(255, 255, 0, 0.2);
+            color: #ffff00;
+        }
+
+        .status-gameover {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff0000;
+        }
+
         .controls {
-            font-size: 12px;
-            line-height: 1.5;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            padding: 10px;
         }
 
         .controls p {
+            font-size: 12px;
             margin-bottom: 5px;
         }
 
-        .game-over {
+        .game-overlay {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
-            border: 2px solid #ff0000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
             display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            border-radius: 5px;
         }
 
-        .game-over h2 {
-            color: #ff0000;
+        .overlay-text {
+            font-size: 24px;
+            font-weight: bold;
             margin-bottom: 20px;
         }
 
-        .game-over button {
-            background: #4CAF50;
+        .overlay-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #4ecdc4;
             color: white;
             border: none;
-            padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
+            transition: background 0.3s;
         }
 
-        .game-over button:hover {
-            background: #45a049;
+        .overlay-button:hover {
+            background: #45b7aa;
         }
     </style>
 </head>
@@ -131,586 +164,511 @@
     <div class="game-container">
         <div class="game-board">
             <canvas id="gameCanvas" width="300" height="600"></canvas>
-            <div class="game-over" id="gameOver">
-                <h2>游戏结束</h2>
-                <p>最终得分: <span id="finalScore">0</span></p>
-                <button onclick="game.restart()">重新开始</button>
+            <div class="game-overlay" id="gameOverlay">
+                <div class="overlay-text" id="overlayText">游戏暂停</div>
+                <button class="overlay-button" id="overlayButton" onclick="gameLoop.resume()">继续游戏</button>
             </div>
         </div>
+        
         <div class="game-info">
+            <div class="game-status" id="gameStatus">准备开始</div>
+            
             <div class="info-section">
                 <h3>得分</h3>
                 <div class="score" id="score">0</div>
             </div>
+            
             <div class="info-section">
                 <h3>等级</h3>
                 <div class="level" id="level">1</div>
             </div>
+            
             <div class="info-section">
                 <h3>消除行数</h3>
                 <div class="lines" id="lines">0</div>
             </div>
+            
             <div class="info-section">
-                <h3>操作说明</h3>
+                <h3>帧率</h3>
+                <div class="fps" id="fps">60</div>
+            </div>
+            
+            <div class="info-section">
+                <h3>控制说明</h3>
                 <div class="controls">
-                    <p>← → 移动</p>
-                    <p>↓ 加速下降</p>
-                    <p>↑ 旋转</p>
-                    <p>空格 暂停</p>
+                    <p>← → : 左右移动</p>
+                    <p>↓ : 快速下降</p>
+                    <p>↑ : 旋转</p>
+                    <p>空格 : 暂停/继续</p>
+                    <p>R : 重新开始</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 游戏配置
-        const GAME_CONFIG = {
-            BOARD_WIDTH: 10,
-            BOARD_HEIGHT: 20,
-            CELL_SIZE: 30,
-            COLORS: {
-                I: '#00f0f0',
-                O: '#f0f000',
-                T: '#a000f0',
-                S: '#00f000',
-                Z: '#f00000',
-                J: '#0000f0',
-                L: '#f0a000',
-                GHOST: 'rgba(255, 255, 255, 0.3)',
-                GRID: '#333'
-            }
+        // 游戏状态枚举
+        const GameStates = {
+            READY: 'ready',
+            RUNNING: 'running',
+            PAUSED: 'paused',
+            GAME_OVER: 'gameover'
         };
 
-        // 方块形状定义
-        const TETROMINOS = {
-            I: {
-                shape: [
-                    [0, 0, 0, 0],
-                    [1, 1, 1, 1],
-                    [0, 0, 0, 0],
-                    [0, 0, 0, 0]
-                ],
-                color: GAME_CONFIG.COLORS.I
-            },
-            O: {
-                shape: [
-                    [1, 1],
-                    [1, 1]
-                ],
-                color: GAME_CONFIG.COLORS.O
-            },
-            T: {
-                shape: [
-                    [0, 1, 0],
-                    [1, 1, 1],
-                    [0, 0, 0]
-                ],
-                color: GAME_CONFIG.COLORS.T
-            },
-            S: {
-                shape: [
-                    [0, 1, 1],
-                    [1, 1, 0],
-                    [0, 0, 0]
-                ],
-                color: GAME_CONFIG.COLORS.S
-            },
-            Z: {
-                shape: [
-                    [1, 1, 0],
-                    [0, 1, 1],
-                    [0, 0, 0]
-                ],
-                color: GAME_CONFIG.COLORS.Z
-            },
-            J: {
-                shape: [
-                    [1, 0, 0],
-                    [1, 1, 1],
-                    [0, 0, 0]
-                ],
-                color: GAME_CONFIG.COLORS.J
-            },
-            L: {
-                shape: [
-                    [0, 0, 1],
-                    [1, 1, 1],
-                    [0, 0, 0]
-                ],
-                color: GAME_CONFIG.COLORS.L
+        // 游戏状态管理器
+        class GameState {
+            constructor() {
+                this.currentState = GameStates.READY;
+                this.previousState = null;
+                this.stateChangeCallbacks = {};
             }
-        };
 
-        // 碰撞检测器
-        class CollisionDetector {
-            static checkBoundaryCollision(piece, grid) {
-                const cells = piece.getOccupiedCells();
-                for (let cell of cells) {
-                    if (cell.x < 0 || cell.x >= GAME_CONFIG.BOARD_WIDTH) {
-                        return true;
-                    }
+            setState(newState) {
+                if (this.currentState !== newState) {
+                    this.previousState = this.currentState;
+                    this.currentState = newState;
+                    this.updateUI();
+                    this.triggerStateChange(newState);
                 }
-                return false;
             }
 
-            static checkBottomCollision(piece, grid) {
-                const cells = piece.getOccupiedCells();
-                for (let cell of cells) {
-                    if (cell.y >= GAME_CONFIG.BOARD_HEIGHT) {
-                        return true;
-                    }
-                    if (grid.isCellOccupied(cell.x, cell.y)) {
-                        return true;
-                    }
+            getState() {
+                return this.currentState;
+            }
+
+            isRunning() {
+                return this.currentState === GameStates.RUNNING;
+            }
+
+            isPaused() {
+                return this.currentState === GameStates.PAUSED;
+            }
+
+            isGameOver() {
+                return this.currentState === GameStates.GAME_OVER;
+            }
+
+            isReady() {
+                return this.currentState === GameStates.READY;
+            }
+
+            onStateChange(state, callback) {
+                if (!this.stateChangeCallbacks[state]) {
+                    this.stateChangeCallbacks[state] = [];
                 }
-                return false;
+                this.stateChangeCallbacks[state].push(callback);
             }
 
-            static checkLeftRightCollision(piece, grid, direction) {
-                const testPiece = piece.clone();
-                testPiece.x += direction;
-                return this.checkBoundaryCollision(testPiece, grid) || 
-                       this.checkBottomCollision(testPiece, grid);
-            }
-
-            static isValidPosition(piece, grid, offsetX = 0, offsetY = 0) {
-                const testPiece = piece.clone();
-                testPiece.x += offsetX;
-                testPiece.y += offsetY;
-                
-                const cells = testPiece.getOccupiedCells();
-                for (let cell of cells) {
-                    // 检查边界
-                    if (cell.x < 0 || cell.x >= GAME_CONFIG.BOARD_WIDTH || 
-                        cell.y >= GAME_CONFIG.BOARD_HEIGHT) {
-                        return false;
-                    }
-                    // 检查是否与已有方块重叠
-                    if (cell.y >= 0 && grid.isCellOccupied(cell.x, cell.y)) {
-                        return false;
-                    }
+            triggerStateChange(state) {
+                if (this.stateChangeCallbacks[state]) {
+                    this.stateChangeCallbacks[state].forEach(callback => callback());
                 }
-                return true;
+            }
+
+            updateUI() {
+                const statusElement = document.getElementById('gameStatus');
+                const overlayElement = document.getElementById('gameOverlay');
+                const overlayText = document.getElementById('overlayText');
+                const overlayButton = document.getElementById('overlayButton');
+
+                // 清除所有状态类
+                statusElement.className = 'game-status';
+
+                switch (this.currentState) {
+                    case GameStates.READY:
+                        statusElement.textContent = '准备开始';
+                        statusElement.classList.add('status-running');
+                        overlayElement.style.display = 'flex';
+                        overlayText.textContent = '按空格开始游戏';
+                        overlayButton.textContent = '开始游戏';
+                        overlayButton.onclick = () => gameLoop.start();
+                        break;
+                    case GameStates.RUNNING:
+                        statusElement.textContent = '游戏进行中';
+                        statusElement.classList.add('status-running');
+                        overlayElement.style.display = 'none';
+                        break;
+                    case GameStates.PAUSED:
+                        statusElement.textContent = '游戏暂停';
+                        statusElement.classList.add('status-paused');
+                        overlayElement.style.display = 'flex';
+                        overlayText.textContent = '游戏暂停';
+                        overlayButton.textContent = '继续游戏';
+                        overlayButton.onclick = () => gameLoop.resume();
+                        break;
+                    case GameStates.GAME_OVER:
+                        statusElement.textContent = '游戏结束';
+                        statusElement.classList.add('status-gameover');
+                        overlayElement.style.display = 'flex';
+                        overlayText.textContent = '游戏结束';
+                        overlayButton.textContent = '重新开始';
+                        overlayButton.onclick = () => gameLoop.restart();
+                        break;
+                }
             }
         }
 
-        // 游戏网格
-        class GameGrid {
+        // 时间管理器
+        class TimeManager {
             constructor() {
-                this.grid = Array(GAME_CONFIG.BOARD_HEIGHT).fill(null)
-                    .map(() => Array(GAME_CONFIG.BOARD_WIDTH).fill(0));
+                this.lastTime = 0;
+                this.deltaTime = 0;
+                this.gameTime = 0;
+                this.fps = 60;
+                this.frameCount = 0;
+                this.fpsUpdateTime = 0;
+                this.targetFPS = 60;
+                this.frameInterval = 1000 / this.targetFPS;
             }
 
-            isCellOccupied(x, y) {
-                if (x < 0 || x >= GAME_CONFIG.BOARD_WIDTH || 
-                    y < 0 || y >= GAME_CONFIG.BOARD_HEIGHT) {
-                    return false;
-                }
-                return this.grid[y][x] !== 0;
-            }
-
-            setCellOccupied(x, y, value) {
-                if (x >= 0 && x < GAME_CONFIG.BOARD_WIDTH && 
-                    y >= 0 && y < GAME_CONFIG.BOARD_HEIGHT) {
-                    this.grid[y][x] = value;
-                }
-            }
-
-            isPositionValid(x, y) {
-                return x >= 0 && x < GAME_CONFIG.BOARD_WIDTH && 
-                       y >= 0 && y < GAME_CONFIG.BOARD_HEIGHT;
-            }
-
-            placePiece(piece) {
-                const cells = piece.getOccupiedCells();
-                for (let cell of cells) {
-                    if (cell.y >= 0) {
-                        this.setCellOccupied(cell.x, cell.y, piece.color);
-                    }
+            update(currentTime) {
+                this.deltaTime = currentTime - this.lastTime;
+                this.lastTime = currentTime;
+                this.gameTime += this.deltaTime;
+                
+                // 计算FPS
+                this.frameCount++;
+                this.fpsUpdateTime += this.deltaTime;
+                
+                if (this.fpsUpdateTime >= 1000) {
+                    this.fps = Math.round(this.frameCount * 1000 / this.fpsUpdateTime);
+                    this.frameCount = 0;
+                    this.fpsUpdateTime = 0;
+                    this.updateFPSDisplay();
                 }
             }
 
-            clearFullLines() {
-                let linesCleared = 0;
-                for (let y = GAME_CONFIG.BOARD_HEIGHT - 1; y >= 0; y--) {
-                    if (this.grid[y].every(cell => cell !== 0)) {
-                        this.grid.splice(y, 1);
-                        this.grid.unshift(Array(GAME_CONFIG.BOARD_WIDTH).fill(0));
-                        linesCleared++;
-                        y++; // 重新检查当前行
-                    }
-                }
-                return linesCleared;
+            getDeltaTime() {
+                return this.deltaTime;
+            }
+
+            getFPS() {
+                return this.fps;
+            }
+
+            getGameTime() {
+                return this.gameTime;
             }
 
             reset() {
-                this.grid = Array(GAME_CONFIG.BOARD_HEIGHT).fill(null)
-                    .map(() => Array(GAME_CONFIG.BOARD_WIDTH).fill(0));
+                this.gameTime = 0;
+                this.frameCount = 0;
+                this.fpsUpdateTime = 0;
+            }
+
+            updateFPSDisplay() {
+                const fpsElement = document.getElementById('fps');
+                if (fpsElement) {
+                    fpsElement.textContent = this.fps;
+                }
             }
         }
 
-        // 方块类
-        class Piece {
-            constructor(type, x = 4, y = 0) {
-                this.type = type;
-                this.shape = TETROMINOS[type].shape;
-                this.color = TETROMINOS[type].color;
-                this.x = x;
-                this.y = y;
-                this.rotation = 0;
+        // 渲染管理器
+        class RenderManager {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.gridWidth = 10;
+                this.gridHeight = 20;
+                this.cellSize = 30;
+                this.gridColor = '#333';
+                this.backgroundColor = '#000';
             }
 
-            clone() {
-                const cloned = new Piece(this.type, this.x, this.y);
-                cloned.rotation = this.rotation;
-                cloned.shape = this.getCurrentShape();
-                return cloned;
+            clearCanvas() {
+                this.ctx.fillStyle = this.backgroundColor;
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             }
 
-            getCurrentShape() {
-                let shape = this.shape;
-                for (let i = 0; i < this.rotation; i++) {
-                    shape = this.rotateMatrix(shape);
+            renderGrid() {
+                this.ctx.strokeStyle = this.gridColor;
+                this.ctx.lineWidth = 1;
+
+                // 绘制垂直线
+                for (let x = 0; x <= this.gridWidth; x++) {
+                    const xPos = x * this.cellSize;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(xPos, 0);
+                    this.ctx.lineTo(xPos, this.canvas.height);
+                    this.ctx.stroke();
                 }
-                return shape;
+
+                // 绘制水平线
+                for (let y = 0; y <= this.gridHeight; y++) {
+                    const yPos = y * this.cellSize;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, yPos);
+                    this.ctx.lineTo(this.canvas.width, yPos);
+                    this.ctx.stroke();
+                }
             }
 
-            rotateMatrix(matrix) {
-                const rows = matrix.length;
-                const cols = matrix[0].length;
-                const rotated = Array(cols).fill(null).map(() => Array(rows).fill(0));
+            renderBlock(x, y, color = '#fff') {
+                const xPos = x * this.cellSize;
+                const yPos = y * this.cellSize;
                 
-                for (let i = 0; i < rows; i++) {
-                    for (let j = 0; j < cols; j++) {
-                        rotated[j][rows - 1 - i] = matrix[i][j];
-                    }
-                }
-                return rotated;
-            }
-
-            getOccupiedCells() {
-                const cells = [];
-                const shape = this.getCurrentShape();
+                this.ctx.fillStyle = color;
+                this.ctx.fillRect(xPos + 1, yPos + 1, this.cellSize - 2, this.cellSize - 2);
                 
-                for (let y = 0; y < shape.length; y++) {
-                    for (let x = 0; x < shape[y].length; x++) {
-                        if (shape[y][x]) {
-                            cells.push({
-                                x: this.x + x,
-                                y: this.y + y
-                            });
-                        }
-                    }
-                }
-                return cells;
+                // 添加边框效果
+                this.ctx.strokeStyle = '#fff';
+                this.ctx.lineWidth = 1;
+                this.ctx.strokeRect(xPos + 1, yPos + 1, this.cellSize - 2, this.cellSize - 2);
             }
 
-            canMoveTo(newX, newY, grid) {
-                return CollisionDetector.isValidPosition(this, grid, newX - this.x, newY - this.y);
-            }
-
-            tryMove(direction, grid) {
-                let newX = this.x;
-                let newY = this.y;
+            renderUI() {
+                // 在画布上绘制一些基本信息
+                this.ctx.fillStyle = '#fff';
+                this.ctx.font = '16px Arial';
+                this.ctx.textAlign = 'left';
                 
-                switch (direction) {
-                    case 'left':
-                        newX--;
-                        break;
-                    case 'right':
-                        newX++;
-                        break;
-                    case 'down':
-                        newY++;
-                        break;
-                }
+                // 可以在这里添加更多UI元素的渲染
+            }
+
+            render() {
+                this.clearCanvas();
+                this.renderGrid();
                 
-                if (this.canMoveTo(newX, newY, grid)) {
-                    this.x = newX;
-                    this.y = newY;
-                    return true;
-                }
-                return false;
-            }
-
-            tryRotate(grid) {
-                const originalRotation = this.rotation;
-                this.rotation = (this.rotation + 1) % 4;
+                // 渲染一些示例方块（实际游戏中会被游戏逻辑替换）
+                this.renderDemoBlocks();
                 
-                if (!CollisionDetector.isValidPosition(this, grid)) {
-                    // 尝试墙踢
-                    const kicks = [[-1, 0], [1, 0], [0, -1], [-2, 0], [2, 0]];
-                    let kicked = false;
-                    
-                    for (let kick of kicks) {
-                        if (CollisionDetector.isValidPosition(this, grid, kick[0], kick[1])) {
-                            this.x += kick[0];
-                            this.y += kick[1];
-                            kicked = true;
-                            break;
-                        }
-                    }
-                    
-                    if (!kicked) {
-                        this.rotation = originalRotation;
-                        return false;
-                    }
-                }
-                return true;
+                this.renderUI();
             }
 
-            lockInPlace(grid) {
-                grid.placePiece(this);
-            }
-
-            getGhostPosition(grid) {
-                const ghost = this.clone();
-                while (CollisionDetector.isValidPosition(ghost, grid, 0, 1)) {
-                    ghost.y++;
+            renderDemoBlocks() {
+                // 渲染一些示例方块来展示效果
+                const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
+                
+                for (let i = 0; i < 5; i++) {
+                    this.renderBlock(i, 18, colors[i]);
+                    this.renderBlock(i + 5, 19, colors[i]);
                 }
-                return ghost;
             }
         }
 
-        // 游戏引擎
-        class GameEngine {
-            constructor() {
-                this.canvas = document.getElementById('gameCanvas');
-                this.ctx = this.canvas.getContext('2d');
-                this.grid = new GameGrid();
-                this.currentPiece = null;
-                this.nextPiece = null;
+        // 游戏主循环
+        class GameLoop {
+            constructor(canvas) {
+                this.gameState = new GameState();
+                this.timeManager = new TimeManager();
+                this.renderManager = new RenderManager(canvas);
+                this.animationId = null;
+                this.isInitialized = false;
+                
+                // 游戏数据
                 this.score = 0;
                 this.level = 1;
                 this.lines = 0;
-                this.gameOver = false;
-                this.paused = false;
-                this.dropTime = 0;
-                this.dropInterval = 1000;
-                this.lastTime = 0;
                 
-                this.initializeGame();
+                this.init();
+            }
+
+            init() {
+                if (this.isInitialized) return;
+                
                 this.setupEventListeners();
-            }
-
-            initializeGame() {
-                this.currentPiece = this.generateRandomPiece();
-                this.nextPiece = this.generateRandomPiece();
-                this.updateDisplay();
-            }
-
-            generateRandomPiece() {
-                const types = Object.keys(TETROMINOS);
-                const randomType = types[Math.floor(Math.random() * types.length)];
-                return new Piece(randomType);
+                this.setupStateCallbacks();
+                this.updateGameData();
+                
+                // 初始渲染
+                this.renderManager.render();
+                
+                this.isInitialized = true;
+                console.log('游戏循环初始化完成');
             }
 
             setupEventListeners() {
-                document.addEventListener('keydown', (e) => {
-                    if (this.gameOver || this.paused) {
-                        if (e.code === 'Space') {
-                            this.paused = !this.paused;
-                        }
-                        return;
+                document.addEventListener('keydown', (event) => {
+                    this.handleKeyPress(event);
+                });
+
+                // 防止页面失焦时游戏继续运行
+                window.addEventListener('blur', () => {
+                    if (this.gameState.isRunning()) {
+                        this.pause();
                     }
-                    
-                    switch (e.code) {
-                        case 'ArrowLeft':
-                            this.currentPiece.tryMove('left', this.grid);
-                            break;
-                        case 'ArrowRight':
-                            this.currentPiece.tryMove('right', this.grid);
-                            break;
-                        case 'ArrowDown':
-                            this.currentPiece.tryMove('down', this.grid);
-                            break;
-                        case 'ArrowUp':
-                            this.currentPiece.tryRotate(this.grid);
-                            break;
-                        case 'Space':
-                            this.paused = !this.paused;
-                            break;
-                    }
-                    e.preventDefault();
                 });
             }
 
-            updatePieceMovement(deltaTime) {
-                if (this.gameOver || this.paused) return;
+            setupStateCallbacks() {
+                this.gameState.onStateChange(GameStates.RUNNING, () => {
+                    console.log('游戏开始运行');
+                });
+
+                this.gameState.onStateChange(GameStates.PAUSED, () => {
+                    console.log('游戏暂停');
+                });
+
+                this.gameState.onStateChange(GameStates.GAME_OVER, () => {
+                    console.log('游戏结束');
+                });
+            }
+
+            handleKeyPress(event) {
+                switch (event.code) {
+                    case 'Space':
+                        event.preventDefault();
+                        if (this.gameState.isReady()) {
+                            this.start();
+                        } else if (this.gameState.isRunning()) {
+                            this.pause();
+                        } else if (this.gameState.isPaused()) {
+                            this.resume();
+                        }
+                        break;
+                    case 'KeyR':
+                        event.preventDefault();
+                        this.restart();
+                        break;
+                    case 'ArrowLeft':
+                    case 'ArrowRight':
+                    case 'ArrowDown':
+                    case 'ArrowUp':
+                        if (this.gameState.isRunning()) {
+                            event.preventDefault();
+                            this.handleGameInput(event.code);
+                        }
+                        break;
+                }
+            }
+
+            handleGameInput(keyCode) {
+                // 这里处理游戏输入逻辑
+                console.log('游戏输入:', keyCode);
                 
-                this.dropTime += deltaTime;
-                if (this.dropTime >= this.dropInterval) {
-                    if (!this.currentPiece.tryMove('down', this.grid)) {
-                        this.lockCurrentPiece();
+                // 示例：模拟得分增加
+                if (keyCode === 'ArrowDown') {
+                    this.score += 10;
+                    this.updateGameData();
+                }
+            }
+
+            start() {
+                if (this.gameState.isReady() || this.gameState.isGameOver()) {
+                    this.gameState.setState(GameStates.RUNNING);
+                    this.timeManager.reset();
+                    this.loop();
+                }
+            }
+
+            stop() {
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+                this.gameState.setState(GameStates.GAME_OVER);
+            }
+
+            pause() {
+                if (this.gameState.isRunning()) {
+                    this.gameState.setState(GameStates.PAUSED);
+                    if (this.animationId) {
+                        cancelAnimationFrame(this.animationId);
+                        this.animationId = null;
                     }
-                    this.dropTime = 0;
                 }
             }
 
-            lockCurrentPiece() {
-                this.currentPiece.lockInPlace(this.grid);
-                
-                const linesCleared = this.grid.clearFullLines();
-                if (linesCleared > 0) {
-                    this.lines += linesCleared;
-                    this.score += this.calculateScore(linesCleared);
-                    this.level = Math.floor(this.lines / 10) + 1;
-                    this.dropInterval = Math.max(100, 1000 - (this.level - 1) * 100);
+            resume() {
+                if (this.gameState.isPaused()) {
+                    this.gameState.setState(GameStates.RUNNING);
+                    this.loop();
                 }
-                
-                this.currentPiece = this.nextPiece;
-                this.nextPiece = this.generateRandomPiece();
-                
-                // 检查游戏结束
-                if (!CollisionDetector.isValidPosition(this.currentPiece, this.grid)) {
-                    this.gameOver = true;
-                    this.showGameOver();
+            }
+
+            restart() {
+                this.stop();
+                this.resetGameData();
+                this.gameState.setState(GameStates.READY);
+                this.renderManager.render();
+            }
+
+            loop(currentTime = 0) {
+                if (!this.gameState.isRunning()) {
+                    return;
                 }
-                
-                this.updateDisplay();
-            }
 
-            calculateScore(linesCleared) {
-                const baseScore = [0, 100, 300, 500, 800];
-                return baseScore[linesCleared] * this.level;
-            }
-
-            handleCollisions() {
-                // 碰撞处理已集成到移动和旋转方法中
-            }
-
-            processGameTick(currentTime) {
-                const deltaTime = currentTime - this.lastTime;
-                this.lastTime = currentTime;
-                
-                this.updatePieceMovement(deltaTime);
+                this.timeManager.update(currentTime);
+                this.update(this.timeManager.getDeltaTime());
                 this.render();
+
+                this.animationId = requestAnimationFrame((time) => this.loop(time));
+            }
+
+            update(deltaTime) {
+                // 这里添加游戏逻辑更新
+                // 例如：方块下落、碰撞检测、消除行等
                 
-                if (!this.gameOver) {
-                    requestAnimationFrame((time) => this.processGameTick(time));
+                // 示例：每秒自动增加一些分数
+                if (Math.random() < 0.01) {
+                    this.score += 1;
+                    this.updateGameData();
+                }
+                
+                // 示例：达到一定分数时游戏结束
+                if (this.score >= 1000) {
+                    this.stop();
                 }
             }
 
             render() {
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                
-                // 绘制网格
-                this.drawGrid();
-                
-                // 绘制已放置的方块
-                this.drawPlacedPieces();
-                
-                // 绘制幽灵方块
-                if (this.currentPiece) {
-                    this.drawGhostPiece();
-                    // 绘制当前方块
-                    this.drawPiece(this.currentPiece);
-                }
+                this.renderManager.render();
             }
 
-            drawGrid() {
-                this.ctx.strokeStyle = GAME_CONFIG.COLORS.GRID;
-                this.ctx.lineWidth = 1;
-                
-                for (let x = 0; x <= GAME_CONFIG.BOARD_WIDTH; x++) {
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(x * GAME_CONFIG.CELL_SIZE, 0);
-                    this.ctx.lineTo(x * GAME_CONFIG.CELL_SIZE, this.canvas.height);
-                    this.ctx.stroke();
-                }
-                
-                for (let y = 0; y <= GAME_CONFIG.BOARD_HEIGHT; y++) {
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(0, y * GAME_CONFIG.CELL_SIZE);
-                    this.ctx.lineTo(this.canvas.width, y * GAME_CONFIG.CELL_SIZE);
-                    this.ctx.stroke();
-                }
-            }
-
-            drawPlacedPieces() {
-                for (let y = 0; y < GAME_CONFIG.BOARD_HEIGHT; y++) {
-                    for (let x = 0; x < GAME_CONFIG.BOARD_WIDTH; x++) {
-                        if (this.grid.grid[y][x]) {
-                            this.drawCell(x, y, this.grid.grid[y][x]);
-                        }
-                    }
-                }
-            }
-
-            drawPiece(piece) {
-                const cells = piece.getOccupiedCells();
-                for (let cell of cells) {
-                    if (cell.y >= 0) {
-                        this.drawCell(cell.x, cell.y, piece.color);
-                    }
-                }
-            }
-
-            drawGhostPiece() {
-                const ghost = this.currentPiece.getGhostPosition(this.grid);
-                const cells = ghost.getOccupiedCells();
-                for (let cell of cells) {
-                    if (cell.y >= 0) {
-                        this.drawCell(cell.x, cell.y, GAME_CONFIG.COLORS.GHOST, true);
-                    }
-                }
-            }
-
-            drawCell(x, y, color, isGhost = false) {
-                const pixelX = x * GAME_CONFIG.CELL_SIZE;
-                const pixelY = y * GAME_CONFIG.CELL_SIZE;
-                
-                this.ctx.fillStyle = color;
-                this.ctx.fillRect(pixelX, pixelY, GAME_CONFIG.CELL_SIZE, GAME_CONFIG.CELL_SIZE);
-                
-                if (!isGhost) {
-                    this.ctx.strokeStyle = '#fff';
-                    this.ctx.lineWidth = 1;
-                    this.ctx.strokeRect(pixelX, pixelY, GAME_CONFIG.CELL_SIZE, GAME_CONFIG.CELL_SIZE);
-                }
-            }
-
-            updateDisplay() {
+            updateGameData() {
                 document.getElementById('score').textContent = this.score;
                 document.getElementById('level').textContent = this.level;
                 document.getElementById('lines').textContent = this.lines;
             }
 
-            showGameOver() {
-                document.getElementById('finalScore').textContent = this.score;
-                document.getElementById('gameOver').style.display = 'block';
-            }
-
-            restart() {
-                this.grid.reset();
+            resetGameData() {
                 this.score = 0;
                 this.level = 1;
                 this.lines = 0;
-                this.gameOver = false;
-                this.paused = false;
-                this.dropTime = 0;
-                this.dropInterval = 1000;
-                
-                this.currentPiece = this.generateRandomPiece();
-                this.nextPiece = this.generateRandomPiece();
-                
-                document.getElementById('gameOver').style.display = 'none';
-                this.updateDisplay();
-                
-                requestAnimationFrame((time) => this.processGameTick(time));
+                this.updateGameData();
             }
 
-            start() {
-                requestAnimationFrame((time) => this.processGameTick(time));
+            // 公共接口方法
+            getScore() {
+                return this.score;
+            }
+
+            getLevel() {
+                return this.level;
+            }
+
+            getLines() {
+                return this.lines;
+            }
+
+            addScore(points) {
+                this.score += points;
+                this.updateGameData();
+            }
+
+            addLines(count) {
+                this.lines += count;
+                // 每消除10行升一级
+                this.level = Math.floor(this.lines / 10) + 1;
+                this.updateGameData();
             }
         }
 
-        // 启动游戏
-        let game;
-        window.addEventListener('load', () => {
-            game = new GameEngine();
-            game.start();
+        // 初始化游戏
+        let gameLoop;
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('gameCanvas');
+            gameLoop = new GameLoop(canvas);
+            
+            console.log('俄罗斯方块游戏已加载');
+            console.log('按空格键开始游戏');
         });
+
+        // 导出全局变量供调试使用
+        window.gameLoop = gameLoop;
+        window.GameStates = GameStates;
     </script>
 </body>
 </html>
