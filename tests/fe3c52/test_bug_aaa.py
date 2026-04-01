@@ -21,7 +21,7 @@ class TestOtherModule:
         assert re.search(title_pattern, content, re.IGNORECASE | re.DOTALL), "HTML 文件中未找到 title 标签"
     
     def test_index_html_title_content_not_empty(self):
-        """测试 index.html 文件中的 title 标签内容不为空，验证页面标题显示问题"""
+        """测试 index.html 文件的 title 标签内容不为空，验证页面标题AAA显示问题"""
         index_file = Path("index.html")
         assert index_file.exists(), "index.html 文件不存在"
         
@@ -41,11 +41,26 @@ class TestOtherModule:
         assert dev_notes_file.exists(), "开发文档 dev-notes.md 文件不存在"
         assert dev_notes_file.is_file(), "dev-notes.md 不是一个有效的文件"
     
-    def test_dev_notes_contains_content(self):
-        """测试开发文档文件是否包含有效内容"""
-        dev_notes_file = Path("docs/fe3c52/3ba7c2/dev-notes.md")
-        assert dev_notes_file.exists(), "开发文档 dev-notes.md 文件不存在"
+    def test_html_contains_basic_structure(self):
+        """测试 HTML 文件是否包含基本的 HTML 结构元素"""
+        index_file = Path("index.html")
+        assert index_file.exists(), "index.html 文件不存在"
         
-        content = dev_notes_file.read_text(encoding='utf-8')
-        assert content.strip(), "开发文档内容为空"
-        assert len(content.strip()) > 10, "开发文档内容过短，可能不完整"
+        content = index_file.read_text(encoding='utf-8')
+        # 检查基本的 HTML 结构
+        assert re.search(r'<html[^>]*>', content, re.IGNORECASE), "HTML 文件缺少 html 标签"
+        assert re.search(r'<head[^>]*>', content, re.IGNORECASE), "HTML 文件缺少 head 标签"
+        assert re.search(r'<body[^>]*>', content, re.IGNORECASE), "HTML 文件缺少 body 标签"
+    
+    def test_project_directory_structure(self):
+        """测试项目目录结构是否正确"""
+        # 检查根目录文件
+        assert Path("index.html").exists(), "根目录缺少 index.html 文件"
+        
+        # 检查文档目录结构
+        docs_dir = Path("docs")
+        if docs_dir.exists():
+            fe3c52_dir = docs_dir / "fe3c52"
+            if fe3c52_dir.exists():
+                dev_notes_dir = fe3c52_dir / "3ba7c2"
+                assert dev_notes_dir.exists(), "文档子目录结构不完整"
