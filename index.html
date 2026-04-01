@@ -49,15 +49,24 @@
             font-weight: bold;
             color: #ffffff;
             text-shadow: 
-                0 0 10px #00ffff,
-                0 0 20px #00ffff,
-                0 0 30px #00ffff,
-                0 0 40px #00ffff;
+                0 0 10px #ff6b6b,
+                0 0 20px #ff6b6b,
+                0 0 30px #ff6b6b,
+                0 0 40px #ff6b6b,
+                0 0 50px #ff6b6b;
             letter-spacing: 0.5rem;
-            animation: titleGlow 2s ease-in-out infinite alternate;
+            animation: aaaGlow 3s ease-in-out infinite alternate;
             text-align: center;
             font-family: 'Courier New', monospace;
             text-transform: uppercase;
+            margin-bottom: 20px;
+            position: relative;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d, #6bcf7f, #4ecdc4, #45b7d1);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: aaaGlow 3s ease-in-out infinite alternate, colorShift 5s ease-in-out infinite;
         }
 
         @keyframes titleGlow {
@@ -70,54 +79,155 @@
             }
             to {
                 text-shadow: 
-                    0 0 20px #00ffff,
-                    0 0 30px #00ffff,
-                    0 0 40px #00ffff,
-                    0 0 50px #00ffff,
-                    0 0 60px #00ffff;
+                    0 0 15px #00ffff,
+                    0 0 25px #00ffff,
+                    0 0 35px #00ffff,
+                    0 0 45px #00ffff,
+                    0 0 55px #00ffff;
             }
         }
 
-        .game-container {
-            display: flex;
-            gap: 30px;
-            align-items: flex-start;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
+        @keyframes aaaGlow {
+            from {
+                text-shadow: 
+                    0 0 10px #ff6b6b,
+                    0 0 20px #ff6b6b,
+                    0 0 30px #ff6b6b,
+                    0 0 40px #ff6b6b,
+                    0 0 50px #ff6b6b;
+                filter: brightness(1);
+                transform: scale(1);
+            }
+            to {
+                text-shadow: 
+                    0 0 15px #ff6b6b,
+                    0 0 25px #ff6b6b,
+                    0 0 35px #ff6b6b,
+                    0 0 45px #ff6b6b,
+                    0 0 55px #ff6b6b,
+                    0 0 65px #ff6b6b;
+                filter: brightness(1.2);
+                transform: scale(1.02);
+            }
         }
 
+        @keyframes colorShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* 响应式适配 */
         @media (max-width: 768px) {
-            .game-title,
             .aaa-title {
                 font-size: 2.5rem;
                 letter-spacing: 0.3rem;
+                text-shadow: 
+                    0 0 8px #ff6b6b,
+                    0 0 16px #ff6b6b,
+                    0 0 24px #ff6b6b,
+                    0 0 32px #ff6b6b;
             }
             
-            .title-container {
-                margin-bottom: 20px;
+            .game-title {
+                font-size: 2.5rem;
+                letter-spacing: 0.3rem;
             }
         }
 
         @media (max-width: 480px) {
-            .game-title,
             .aaa-title {
                 font-size: 2rem;
                 letter-spacing: 0.2rem;
+                text-shadow: 
+                    0 0 6px #ff6b6b,
+                    0 0 12px #ff6b6b,
+                    0 0 18px #ff6b6b,
+                    0 0 24px #ff6b6b;
+            }
+            
+            .game-title {
+                font-size: 2rem;
+                letter-spacing: 0.2rem;
+            }
+            
+            body {
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .aaa-title {
+                font-size: 1.5rem;
+                letter-spacing: 0.1rem;
+                text-shadow: 
+                    0 0 4px #ff6b6b,
+                    0 0 8px #ff6b6b,
+                    0 0 12px #ff6b6b;
+            }
+            
+            .game-title {
+                font-size: 1.5rem;
+                letter-spacing: 0.1rem;
+            }
+        }
+
+        /* 高分辨率屏幕适配 */
+        @media (min-width: 1200px) {
+            .aaa-title {
+                font-size: 5rem;
+                letter-spacing: 0.8rem;
+                text-shadow: 
+                    0 0 12px #ff6b6b,
+                    0 0 24px #ff6b6b,
+                    0 0 36px #ff6b6b,
+                    0 0 48px #ff6b6b,
+                    0 0 60px #ff6b6b;
+            }
+            
+            .game-title {
+                font-size: 5rem;
+                letter-spacing: 0.8rem;
+            }
+        }
+
+        /* 暗色模式适配 */
+        @media (prefers-color-scheme: dark) {
+            .aaa-title {
+                text-shadow: 
+                    0 0 15px #ff6b6b,
+                    0 0 30px #ff6b6b,
+                    0 0 45px #ff6b6b,
+                    0 0 60px #ff6b6b;
+            }
+        }
+
+        /* 减少动画效果（用户偏好设置） */
+        @media (prefers-reduced-motion: reduce) {
+            .aaa-title {
+                animation: none;
+                text-shadow: 
+                    0 0 10px #ff6b6b,
+                    0 0 20px #ff6b6b,
+                    0 0 30px #ff6b6b;
+            }
+            
+            .game-title {
+                animation: none;
             }
         }
     </style>
 </head>
 <body>
     <div class="title-container">
-        <h1 class="aaa-title">AAA</h1>
+        <h1 class="aaa-title">AAA TETRIS</h1>
         <h2 class="game-title">俄罗斯方块</h2>
-    </div>
-    
-    <div class="game-container">
-        <!-- 游戏内容将在这里添加 -->
     </div>
 </body>
 </html>
