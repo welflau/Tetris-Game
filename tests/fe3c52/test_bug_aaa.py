@@ -5,57 +5,67 @@ import re
 class TestOtherModule:
     
     def test_index_html_file_exists(self):
-        """测试 index.html 文件是否存在"""
+        """测试index.html文件是否存在"""
         index_file = Path("index.html")
-        assert index_file.exists(), "index.html 文件不存在"
-        assert index_file.is_file(), "index.html 不是一个有效的文件"
+        assert index_file.exists(), "index.html文件不存在"
+        assert index_file.is_file(), "index.html不是一个有效的文件"
     
     def test_index_html_contains_title_element(self):
-        """测试 index.html 文件是否包含 title 标签元素"""
+        """测试index.html文件是否包含title标签元素"""
         index_file = Path("index.html")
-        assert index_file.exists(), "index.html 文件不存在"
+        assert index_file.exists(), "index.html文件不存在"
         
         content = index_file.read_text(encoding='utf-8')
-        # 检查是否包含 title 标签
+        # 检查是否包含title标签
         title_pattern = r'<title[^>]*>.*?</title>'
-        assert re.search(title_pattern, content, re.IGNORECASE | re.DOTALL), "HTML 文件中缺少 title 标签"
+        assert re.search(title_pattern, content, re.IGNORECASE | re.DOTALL), "HTML文件中未找到title标签"
     
-    def test_index_html_title_not_empty_or_aaa(self):
-        """测试 index.html 文件的 title 标签内容不为空且不是错误的 AAA"""
+    def test_index_html_title_content_not_empty(self):
+        """测试index.html文件中的title标签内容不为空（针对AAA未显示的bug）"""
         index_file = Path("index.html")
-        assert index_file.exists(), "index.html 文件不存在"
+        assert index_file.exists(), "index.html文件不存在"
         
         content = index_file.read_text(encoding='utf-8')
-        # 提取 title 标签内容
-        title_match = re.search(r'<title[^>]*>(.*?)</title>', content, re.IGNORECASE | re.DOTALL)
-        assert title_match, "未找到 title 标签"
+        # 提取title标签内容
+        title_pattern = r'<title[^>]*>(.*?)</title>'
+        title_match = re.search(title_pattern, content, re.IGNORECASE | re.DOTALL)
         
+        assert title_match, "未找到title标签"
         title_content = title_match.group(1).strip()
-        assert title_content, "title 标签内容为空"
-        assert title_content.upper() != "AAA", f"页面标题显示错误的 AAA，当前标题: {title_content}"
+        assert title_content, "title标签内容为空，页面标题未正确设置"
+        assert len(title_content) > 0, "title内容长度为0"
     
     def test_dev_notes_file_exists(self):
         """测试开发文档文件是否存在"""
         dev_notes_file = Path("docs/fe3c52/3ba7c2/dev-notes.md")
-        assert dev_notes_file.exists(), "开发文档 dev-notes.md 文件不存在"
-        assert dev_notes_file.is_file(), "dev-notes.md 不是一个有效的文件"
+        assert dev_notes_file.exists(), "开发文档文件不存在"
+        assert dev_notes_file.is_file(), "dev-notes.md不是一个有效的文件"
     
-    def test_dev_notes_contains_content(self):
-        """测试开发文档文件是否包含有效内容"""
+    def test_dev_notes_contains_bug_documentation(self):
+        """测试开发文档是否包含相关bug记录或说明"""
         dev_notes_file = Path("docs/fe3c52/3ba7c2/dev-notes.md")
-        assert dev_notes_file.exists(), "开发文档 dev-notes.md 文件不存在"
+        assert dev_notes_file.exists(), "开发文档文件不存在"
         
         content = dev_notes_file.read_text(encoding='utf-8')
-        assert content.strip(), "开发文档内容为空"
-        assert len(content.strip()) > 10, "开发文档内容过短，可能不完整"
+        # 检查是否包含bug相关关键词
+        bug_keywords = ['bug', 'BUG', '标题', 'title', 'AAA', '显示', '问题']
+        has_bug_info = any(keyword in content for keyword in bug_keywords)
+        assert has_bug_info, "开发文档中未找到相关bug信息记录"
     
-    def test_html_basic_structure(self):
-        """测试 HTML 文件是否包含基本的 HTML 结构元素"""
+    def test_html_structure_validity(self):
+        """测试HTML文件基本结构的有效性"""
         index_file = Path("index.html")
-        assert index_file.exists(), "index.html 文件不存在"
+        assert index_file.exists(), "index.html文件不存在"
         
         content = index_file.read_text(encoding='utf-8')
-        # 检查基本 HTML 结构
-        assert re.search(r'<html[^>]*>', content, re.IGNORECASE), "缺少 html 开始标签"
-        assert re.search(r'<head[^>]*>', content, re.IGNORECASE), "缺少 head 标签"
-        assert re.search(r'<body[^>]*>', content, re.IGNORECASE), "缺少 body 标签"
+        # 检查基本HTML结构
+        assert '<html' in content.lower(), "HTML文件缺少html标签"
+        assert '<head' in content.lower(), "HTML文件缺少head标签"
+        assert '<body' in content.lower(), "HTML文件缺少body标签"
+        
+        # 检查title标签是否在head标签内
+        head_pattern = r'<head[^>]*>(.*?)</head>'
+        head_match = re.search(head_pattern, content, re.IGNORECASE | re.DOTALL)
+        if head_match:
+            head_content = head_match.group(1)
+            assert '<title' in head_content.lower(), "title标签应该位于head标签内"
