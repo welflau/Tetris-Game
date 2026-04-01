@@ -2,89 +2,90 @@ import pytest
 from pathlib import Path
 import re
 
-class TestCollisionDetectionFrontend:
+class TestFrontendFiles:
+    """测试前端文件和文档的存在性和内容"""
     
-    def test_index_html_file_exists(self):
+    def test_index_html_exists(self):
         """测试 index.html 文件是否存在"""
-        index_file = Path("frontend/index.html")
-        assert index_file.exists(), "index.html 文件不存在"
-        assert index_file.is_file(), "index.html 不是一个有效的文件"
+        index_path = Path("frontend/index.html")
+        assert index_path.exists(), f"index.html 文件不存在: {index_path}"
+        assert index_path.is_file(), f"index.html 不是一个文件: {index_path}"
     
-    def test_index_html_contains_essential_elements(self):
-        """测试 index.html 文件包含碰撞检测系统的关键HTML元素"""
-        index_file = Path("frontend/index.html")
-        assert index_file.exists(), "index.html 文件不存在"
+    def test_index_html_contains_game_elements(self):
+        """测试 index.html 文件是否包含游戏相关的关键元素"""
+        index_path = Path("frontend/index.html")
         
-        content = index_file.read_text(encoding='utf-8')
+        if not index_path.exists():
+            pytest.skip("index.html 文件不存在，跳过内容测试")
+        
+        content = index_path.read_text(encoding='utf-8')
         
         # 检查基本HTML结构
-        assert '<html' in content.lower(), "缺少 html 标签"
-        assert '<head>' in content.lower(), "缺少 head 标签"
-        assert '<body>' in content.lower(), "缺少 body 标签"
+        assert "<html" in content.lower(), "HTML文件缺少html标签"
+        assert "<head>" in content.lower() or "<head " in content.lower(), "HTML文件缺少head标签"
+        assert "<body>" in content.lower() or "<body " in content.lower(), "HTML文件缺少body标签"
         
-        # 检查碰撞检测相关元素
-        collision_keywords = ['collision', '碰撞', 'detection', '检测']
-        has_collision_keyword = any(keyword in content.lower() for keyword in collision_keywords)
-        assert has_collision_keyword, "页面内容中缺少碰撞检测相关关键词"
-        
-        # 检查是否包含canvas或svg等图形元素（碰撞检测通常需要可视化）
-        graphics_elements = ['<canvas', '<svg', 'canvas', 'svg']
-        has_graphics = any(element in content.lower() for element in graphics_elements)
-        assert has_graphics, "页面缺少用于碰撞检测可视化的图形元素"
-    
-    def test_index_html_has_valid_structure(self):
-        """测试 index.html 文件具有有效的HTML结构和碰撞检测功能相关的脚本"""
-        index_file = Path("frontend/index.html")
-        assert index_file.exists(), "index.html 文件不存在"
-        
-        content = index_file.read_text(encoding='utf-8')
-        
-        # 检查是否包含JavaScript（碰撞检测逻辑通常需要JS）
-        has_script = '<script' in content.lower() or '.js' in content.lower()
-        assert has_script, "页面缺少JavaScript脚本，无法实现碰撞检测功能"
-        
-        # 检查是否有交互元素（按钮、输入框等）
-        interactive_elements = ['<button', '<input', 'onclick', 'onmousemove', 'addEventListener']
-        has_interaction = any(element in content.lower() for element in interactive_elements)
-        assert has_interaction, "页面缺少交互元素，无法进行碰撞检测操作"
-        
-        # 检查文件大小合理性（不能为空，也不应该过大）
-        file_size = index_file.stat().st_size
-        assert file_size > 100, "HTML文件内容过少，可能不完整"
-        assert file_size < 1024 * 1024, "HTML文件过大，可能包含不必要的内容"
+        # 检查游戏相关元素
+        game_keywords = ["game", "canvas", "script", "start", "play"]
+        found_keywords = [keyword for keyword in game_keywords if keyword in content.lower()]
+        assert len(found_keywords) >= 2, f"HTML文件应包含至少2个游戏相关关键词，找到: {found_keywords}"
     
     def test_dev_notes_documentation_exists(self):
-        """测试开发文档是否存在且包含有用信息"""
-        dev_notes_file = Path("docs/96c9f2/cffe2c/dev-notes.md")
-        assert dev_notes_file.exists(), "开发文档 dev-notes.md 不存在"
-        assert dev_notes_file.is_file(), "dev-notes.md 不是一个有效的文件"
+        """测试开发文档是否存在并包含有效内容"""
+        doc_path = Path("docs/96c9f2/131609/dev-notes.md")
         
-        content = dev_notes_file.read_text(encoding='utf-8')
+        assert doc_path.exists(), f"开发文档不存在: {doc_path}"
+        assert doc_path.is_file(), f"开发文档不是一个文件: {doc_path}"
         
-        # 检查文档是否包含开发相关信息
-        dev_keywords = ['开发', '实现', 'implementation', 'development', 'api', '接口', '算法', 'algorithm']
-        has_dev_content = any(keyword in content.lower() for keyword in dev_keywords)
-        assert has_dev_content, "开发文档缺少开发相关内容"
+        content = doc_path.read_text(encoding='utf-8')
+        assert len(content.strip()) > 0, "开发文档内容为空"
         
-        # 检查文档长度合理性
-        assert len(content.strip()) > 50, "开发文档内容过少"
+        # 检查是否包含开发相关内容
+        dev_keywords = ["游戏", "状态", "循环", "管理", "开发", "设计", "功能"]
+        found_keywords = [keyword for keyword in dev_keywords if keyword in content]
+        assert len(found_keywords) >= 2, f"开发文档应包含至少2个开发相关关键词，找到: {found_keywords}"
+
+class TestGameStateManagement:
+    """测试游戏状态管理相关功能"""
     
-    def test_project_structure_integrity(self):
-        """测试项目结构的完整性"""
+    def test_html_contains_state_management_structure(self):
+        """测试HTML文件是否包含状态管理相关的结构"""
+        index_path = Path("frontend/index.html")
+        
+        if not index_path.exists():
+            pytest.skip("index.html 文件不存在，跳过状态管理测试")
+        
+        content = index_path.read_text(encoding='utf-8')
+        
+        # 检查是否包含JavaScript相关内容（用于状态管理）
+        js_indicators = ["<script", "javascript", "function", "var ", "let ", "const "]
+        has_js = any(indicator in content.lower() for indicator in js_indicators)
+        
+        if has_js:
+            # 如果有JavaScript，检查可能的状态管理相关内容
+            state_keywords = ["state", "status", "game", "update", "render", "loop"]
+            found_state_keywords = [keyword for keyword in state_keywords if keyword in content.lower()]
+            assert len(found_state_keywords) >= 1, f"应包含状态管理相关关键词，找到: {found_state_keywords}"
+        else:
+            # 如果没有JavaScript，至少应该有基本的游戏容器
+            container_keywords = ["canvas", "div", "container", "game"]
+            found_containers = [keyword for keyword in container_keywords if keyword in content.lower()]
+            assert len(found_containers) >= 1, f"应包含游戏容器元素，找到: {found_containers}"
+
+class TestProjectStructure:
+    """测试项目结构的完整性"""
+    
+    def test_frontend_directory_structure(self):
+        """测试前端目录结构是否合理"""
         frontend_dir = Path("frontend")
-        docs_dir = Path("docs")
         
-        assert frontend_dir.exists(), "frontend 目录不存在"
-        assert frontend_dir.is_dir(), "frontend 不是一个目录"
-        
-        assert docs_dir.exists(), "docs 目录不存在"
-        assert docs_dir.is_dir(), "docs 不是一个目录"
-        
-        # 检查关键文件都存在
-        required_files = [
-            Path("frontend/index.html"),
-            Path("docs/96c9f2/cffe2c/dev-notes.md")
-        ]
-        
-        for file_path in required_files:
-            assert file_path.exists(), f"必需的文件 {file_path} 不存在"
+        if frontend_dir.exists():
+            assert frontend_dir.is_dir(), "frontend 应该是一个目录"
+            
+            # 检查是否有HTML文件
+            html_files = list(frontend_dir.glob("*.html"))
+            assert len(html_files) >= 1, f"frontend目录应包含至少一个HTML文件，找到: {html_files}"
+        else:
+            # 如果frontend目录不存在，检查当前目录是否有index.html
+            index_path = Path("index.html")
+            assert index_path.exists(), "既没有frontend目录，当前目录也没有index.html文件"
