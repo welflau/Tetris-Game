@@ -29,6 +29,62 @@
             animation-iteration-count: infinite;
         }
 
+        /* 雪花样式变体 */
+        .snowflake.type-1 {
+            color: #ffffff;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+        }
+
+        .snowflake.type-2 {
+            color: #e6f3ff;
+            text-shadow: 0 0 3px rgba(230, 243, 255, 0.6);
+        }
+
+        .snowflake.type-3 {
+            color: #cce7ff;
+            text-shadow: 0 0 4px rgba(204, 231, 255, 0.7);
+        }
+
+        .snowflake.type-4 {
+            color: #b3daff;
+            text-shadow: 0 0 6px rgba(179, 218, 255, 0.9);
+        }
+
+        .snowflake.type-5 {
+            color: #99ccff;
+            text-shadow: 0 0 2px rgba(153, 204, 255, 0.5);
+        }
+
+        /* 雪花大小变体 */
+        .snowflake.size-small {
+            font-size: 0.8em;
+        }
+
+        .snowflake.size-medium {
+            font-size: 1.2em;
+        }
+
+        .snowflake.size-large {
+            font-size: 1.6em;
+        }
+
+        .snowflake.size-xlarge {
+            font-size: 2.0em;
+        }
+
+        /* 雪花透明度变体 */
+        .snowflake.opacity-light {
+            opacity: 0.6;
+        }
+
+        .snowflake.opacity-medium {
+            opacity: 0.8;
+        }
+
+        .snowflake.opacity-heavy {
+            opacity: 1.0;
+        }
+
         @keyframes snowfall {
             0% {
                 transform: translateY(-100px) rotate(0deg);
@@ -36,6 +92,54 @@
             100% {
                 transform: translateY(100vh) rotate(360deg);
             }
+        }
+
+        @keyframes snowfall-left {
+            0% {
+                transform: translateY(-100px) translateX(0px) rotate(0deg);
+            }
+            100% {
+                transform: translateY(100vh) translateX(-50px) rotate(360deg);
+            }
+        }
+
+        @keyframes snowfall-right {
+            0% {
+                transform: translateY(-100px) translateX(0px) rotate(0deg);
+            }
+            100% {
+                transform: translateY(100vh) translateX(50px) rotate(360deg);
+            }
+        }
+
+        @keyframes snowfall-zigzag {
+            0% {
+                transform: translateY(-100px) translateX(0px) rotate(0deg);
+            }
+            25% {
+                transform: translateY(25vh) translateX(20px) rotate(90deg);
+            }
+            50% {
+                transform: translateY(50vh) translateX(-20px) rotate(180deg);
+            }
+            75% {
+                transform: translateY(75vh) translateX(20px) rotate(270deg);
+            }
+            100% {
+                transform: translateY(100vh) translateX(0px) rotate(360deg);
+            }
+        }
+
+        .snowflake.drift-left {
+            animation-name: snowfall-left;
+        }
+
+        .snowflake.drift-right {
+            animation-name: snowfall-right;
+        }
+
+        .snowflake.drift-zigzag {
+            animation-name: snowfall-zigzag;
         }
 
         .controls {
@@ -48,44 +152,58 @@
             backdrop-filter: blur(10px);
             color: white;
             z-index: 1000;
+            max-width: 300px;
         }
 
         .controls h3 {
             margin-bottom: 15px;
             color: #fff;
+            text-align: center;
         }
 
         .control-group {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         .control-group label {
             display: block;
             margin-bottom: 5px;
             font-size: 14px;
+            font-weight: bold;
         }
 
-        .control-group input {
+        .control-group input, .control-group select {
             width: 100%;
-            padding: 5px;
+            padding: 8px;
             border: none;
             border-radius: 5px;
             background: rgba(255, 255, 255, 0.2);
             color: white;
+            font-size: 14px;
         }
 
         .control-group input::placeholder {
             color: rgba(255, 255, 255, 0.7);
         }
 
+        .control-group select {
+            cursor: pointer;
+        }
+
+        .control-group select option {
+            background: #2a5298;
+            color: white;
+        }
+
         button {
             background: rgba(255, 255, 255, 0.2);
             color: white;
             border: none;
-            padding: 8px 15px;
+            padding: 10px 15px;
             border-radius: 5px;
             cursor: pointer;
-            margin: 5px 5px 0 0;
+            margin: 5px;
+            font-size: 14px;
             transition: background 0.3s;
         }
 
@@ -93,361 +211,362 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
-        .stats {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-            color: white;
-            z-index: 1000;
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .color-preview {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .color-sample {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .color-sample:hover {
+            transform: scale(1.1);
+        }
+
+        .color-sample.active {
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        .snowflake-preview {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .snowflake-sample {
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+
+        .snowflake-sample:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .snowflake-sample.active {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
     </style>
 </head>
 <body>
     <div class="controls">
-        <h3>雪花控制器</h3>
+        <h3>❄️ 雪花控制台</h3>
+        
         <div class="control-group">
-            <label>雪花数量:</label>
+            <label>雪花数量</label>
             <input type="range" id="snowflakeCount" min="10" max="200" value="50">
             <span id="countValue">50</span>
         </div>
+
         <div class="control-group">
-            <label>下落速度:</label>
+            <label>下落速度</label>
             <input type="range" id="fallSpeed" min="1" max="10" value="5">
             <span id="speedValue">5</span>
         </div>
-        <div class="control-group">
-            <label>雪花大小:</label>
-            <input type="range" id="snowflakeSize" min="0.5" max="3" step="0.1" value="1">
-            <span id="sizeValue">1</span>
-        </div>
-        <button onclick="snowflakeSystem.start()">开始</button>
-        <button onclick="snowflakeSystem.stop()">停止</button>
-        <button onclick="snowflakeSystem.reset()">重置</button>
-    </div>
 
-    <div class="stats">
-        <div>活跃雪花: <span id="activeCount">0</span></div>
-        <div>池中雪花: <span id="poolCount">0</span></div>
-        <div>总创建数: <span id="totalCreated">0</span></div>
+        <div class="control-group">
+            <label>雪花样式</label>
+            <div class="snowflake-preview">
+                <span class="snowflake-sample active" data-type="❄">❄</span>
+                <span class="snowflake-sample" data-type="❅">❅</span>
+                <span class="snowflake-sample" data-type="❆">❆</span>
+                <span class="snowflake-sample" data-type="*">*</span>
+                <span class="snowflake-sample" data-type="•">•</span>
+                <span class="snowflake-sample" data-type="◦">◦</span>
+                <span class="snowflake-sample" data-type="⋄">⋄</span>
+                <span class="snowflake-sample" data-type="✦">✦</span>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label>颜色方案</label>
+            <div class="color-preview">
+                <div class="color-sample active" data-color="white" style="background: #ffffff;"></div>
+                <div class="color-sample" data-color="blue" style="background: #e6f3ff;"></div>
+                <div class="color-sample" data-color="cyan" style="background: #cce7ff;"></div>
+                <div class="color-sample" data-color="light-blue" style="background: #b3daff;"></div>
+                <div class="color-sample" data-color="sky" style="background: #99ccff;"></div>
+                <div class="color-sample" data-color="rainbow" style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);"></div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label>飘落模式</label>
+            <select id="driftMode">
+                <option value="normal">直线下落</option>
+                <option value="left">向左飘</option>
+                <option value="right">向右飘</option>
+                <option value="zigzag">之字形</option>
+                <option value="random">随机模式</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>雪花大小</label>
+            <select id="snowflakeSize">
+                <option value="small">小雪花</option>
+                <option value="medium" selected>中雪花</option>
+                <option value="large">大雪花</option>
+                <option value="mixed">混合大小</option>
+            </select>
+        </div>
+
+        <div class="button-group">
+            <button onclick="startSnowfall()">开始下雪</button>
+            <button onclick="stopSnowfall()">停止下雪</button>
+            <button onclick="clearSnowflakes()">清除雪花</button>
+        </div>
     </div>
 
     <script>
-        // 雪花配置管理器
-        class SnowflakeConfig {
-            constructor() {
-                this.sizeRange = { min: 0.5, max: 2.5 };
-                this.speedRange = { min: 2, max: 8 };
-                this.opacityRange = { min: 0.3, max: 1 };
-                this.colors = ['#ffffff', '#f0f8ff', '#e6f3ff', '#ddeeff'];
-                this.shapes = ['❄', '❅', '❆', '✻', '✼', '❈'];
-            }
+        // 雪花视觉素材配置
+        const SnowflakeAssets = {
+            // 雪花图标库
+            icons: {
+                classic: ['❄', '❅', '❆'],
+                simple: ['*', '•', '◦'],
+                decorative: ['⋄', '✦', '✧', '✩', '✪'],
+                unicode: ['❄️', '❅️', '❆️', '🌨️'],
+                custom: ['⁂', '※', '⁕', '⁜']
+            },
 
-            getRandomSize() {
-                const baseSize = parseFloat(document.getElementById('snowflakeSize').value);
-                return (Math.random() * (this.sizeRange.max - this.sizeRange.min) + this.sizeRange.min) * baseSize;
-            }
+            // 颜色方案
+            colorSchemes: {
+                white: {
+                    colors: ['#ffffff', '#f8f9fa', '#e9ecef'],
+                    shadow: 'rgba(255, 255, 255, 0.8)'
+                },
+                blue: {
+                    colors: ['#e6f3ff', '#cce7ff', '#b3daff'],
+                    shadow: 'rgba(230, 243, 255, 0.6)'
+                },
+                cyan: {
+                    colors: ['#cce7ff', '#b3daff', '#99ccff'],
+                    shadow: 'rgba(204, 231, 255, 0.7)'
+                },
+                'light-blue': {
+                    colors: ['#b3daff', '#99ccff', '#80bfff'],
+                    shadow: 'rgba(179, 218, 255, 0.9)'
+                },
+                sky: {
+                    colors: ['#99ccff', '#80bfff', '#66b3ff'],
+                    shadow: 'rgba(153, 204, 255, 0.5)'
+                },
+                rainbow: {
+                    colors: ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#fd79a8'],
+                    shadow: 'rgba(255, 255, 255, 0.3)'
+                }
+            },
 
-            getRandomSpeed() {
-                const baseSpeed = parseFloat(document.getElementById('fallSpeed').value);
-                return (Math.random() * (this.speedRange.max - this.speedRange.min) + this.speedRange.min) * baseSpeed;
-            }
+            // 大小配置
+            sizes: {
+                small: { min: 0.6, max: 1.0 },
+                medium: { min: 1.0, max: 1.5 },
+                large: { min: 1.5, max: 2.2 },
+                mixed: { min: 0.6, max: 2.2 }
+            },
 
-            getRandomOpacity() {
-                return Math.random() * (this.opacityRange.max - this.opacityRange.min) + this.opacityRange.min;
-            }
+            // 透明度配置
+            opacity: {
+                light: { min: 0.4, max: 0.7 },
+                medium: { min: 0.6, max: 0.9 },
+                heavy: { min: 0.8, max: 1.0 }
+            },
 
-            getRandomPosition() {
-                return {
-                    x: Math.random() * window.innerWidth,
-                    y: -50 - Math.random() * 50
-                };
+            // 动画配置
+            animations: {
+                normal: 'snowfall',
+                left: 'snowfall-left',
+                right: 'snowfall-right',
+                zigzag: 'snowfall-zigzag'
             }
+        };
 
-            getRandomColor() {
-                return this.colors[Math.floor(Math.random() * this.colors.length)];
+        // 全局变量
+        let snowflakeInterval;
+        let activeSnowflakes = [];
+        let currentSettings = {
+            count: 50,
+            speed: 5,
+            icon: '❄',
+            colorScheme: 'white',
+            driftMode: 'normal',
+            size: 'medium'
+        };
+
+        // 初始化控件事件
+        function initializeControls() {
+            // 雪花数量控制
+            const countSlider = document.getElementById('snowflakeCount');
+            const countValue = document.getElementById('countValue');
+            countSlider.addEventListener('input', (e) => {
+                currentSettings.count = parseInt(e.target.value);
+                countValue.textContent = e.target.value;
+            });
+
+            // 速度控制
+            const speedSlider = document.getElementById('fallSpeed');
+            const speedValue = document.getElementById('speedValue');
+            speedSlider.addEventListener('input', (e) => {
+                currentSettings.speed = parseInt(e.target.value);
+                speedValue.textContent = e.target.value;
+            });
+
+            // 雪花样式选择
+            document.querySelectorAll('.snowflake-sample').forEach(sample => {
+                sample.addEventListener('click', (e) => {
+                    document.querySelectorAll('.snowflake-sample').forEach(s => s.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentSettings.icon = e.target.dataset.type;
+                });
+            });
+
+            // 颜色方案选择
+            document.querySelectorAll('.color-sample').forEach(sample => {
+                sample.addEventListener('click', (e) => {
+                    document.querySelectorAll('.color-sample').forEach(s => s.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentSettings.colorScheme = e.target.dataset.color;
+                });
+            });
+
+            // 飘落模式选择
+            document.getElementById('driftMode').addEventListener('change', (e) => {
+                currentSettings.driftMode = e.target.value;
+            });
+
+            // 雪花大小选择
+            document.getElementById('snowflakeSize').addEventListener('change', (e) => {
+                currentSettings.size = e.target.value;
+            });
+        }
+
+        // 创建雪花元素
+        function createSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.className = 'snowflake';
+            
+            // 设置雪花图标
+            snowflake.textContent = currentSettings.icon;
+            
+            // 设置颜色
+            const colorScheme = SnowflakeAssets.colorSchemes[currentSettings.colorScheme];
+            const randomColor = colorScheme.colors[Math.floor(Math.random() * colorScheme.colors.length)];
+            snowflake.style.color = randomColor;
+            snowflake.style.textShadow = `0 0 ${Math.random() * 8 + 2}px ${colorScheme.shadow}`;
+            
+            // 设置大小
+            const sizeConfig = SnowflakeAssets.sizes[currentSettings.size];
+            const size = Math.random() * (sizeConfig.max - sizeConfig.min) + sizeConfig.min;
+            snowflake.style.fontSize = `${size}em`;
+            
+            // 设置透明度
+            const opacity = Math.random() * 0.5 + 0.5;
+            snowflake.style.opacity = opacity;
+            
+            // 设置初始位置
+            snowflake.style.left = Math.random() * window.innerWidth + 'px';
+            snowflake.style.top = '-50px';
+            
+            // 设置动画
+            let animationName = 'snowfall';
+            if (currentSettings.driftMode === 'random') {
+                const modes = ['normal', 'left', 'right', 'zigzag'];
+                const randomMode = modes[Math.floor(Math.random() * modes.length)];
+                animationName = SnowflakeAssets.animations[randomMode];
+            } else {
+                animationName = SnowflakeAssets.animations[currentSettings.driftMode];
             }
+            
+            snowflake.style.animationName = animationName;
+            snowflake.style.animationDuration = (Math.random() * 3 + 2) / (currentSettings.speed / 5) + 's';
+            snowflake.style.animationDelay = Math.random() * 2 + 's';
+            
+            // 添加到页面
+            document.body.appendChild(snowflake);
+            activeSnowflakes.push(snowflake);
+            
+            // 动画结束后移除
+            snowflake.addEventListener('animationend', () => {
+                if (snowflake.parentNode) {
+                    snowflake.parentNode.removeChild(snowflake);
+                }
+                const index = activeSnowflakes.indexOf(snowflake);
+                if (index > -1) {
+                    activeSnowflakes.splice(index, 1);
+                }
+            });
+        }
 
-            getRandomShape() {
-                return this.shapes[Math.floor(Math.random() * this.shapes.length)];
+        // 开始下雪
+        function startSnowfall() {
+            if (snowflakeInterval) {
+                clearInterval(snowflakeInterval);
+            }
+            
+            const interval = Math.max(100, 2000 / currentSettings.count);
+            snowflakeInterval = setInterval(createSnowflake, interval);
+        }
+
+        // 停止下雪
+        function stopSnowfall() {
+            if (snowflakeInterval) {
+                clearInterval(snowflakeInterval);
+                snowflakeInterval = null;
             }
         }
 
-        // 雪花对象池
-        class SnowflakePool {
-            constructor(initialSize = 50) {
-                this.pool = [];
-                this.activeSnowflakes = new Set();
-                this.initPool(initialSize);
-            }
-
-            initPool(size) {
-                for (let i = 0; i < size; i++) {
-                    const element = document.createElement('div');
-                    element.className = 'snowflake';
-                    element.style.display = 'none';
-                    document.body.appendChild(element);
-                    this.pool.push({
-                        element: element,
-                        x: 0,
-                        y: 0,
-                        speed: 0,
-                        size: 0,
-                        opacity: 0,
-                        rotation: 0,
-                        rotationSpeed: 0,
-                        active: false
-                    });
+        // 清除所有雪花
+        function clearSnowflakes() {
+            stopSnowfall();
+            activeSnowflakes.forEach(snowflake => {
+                if (snowflake.parentNode) {
+                    snowflake.parentNode.removeChild(snowflake);
                 }
-            }
-
-            getSnowflake() {
-                let snowflake = this.pool.find(s => !s.active);
-                
-                if (!snowflake) {
-                    this.expandPool();
-                    snowflake = this.pool.find(s => !s.active);
-                }
-
-                if (snowflake) {
-                    snowflake.active = true;
-                    this.activeSnowflakes.add(snowflake);
-                    snowflake.element.style.display = 'block';
-                }
-
-                return snowflake;
-            }
-
-            returnSnowflake(snowflake) {
-                if (snowflake && snowflake.active) {
-                    snowflake.active = false;
-                    snowflake.element.style.display = 'none';
-                    this.activeSnowflakes.delete(snowflake);
-                }
-            }
-
-            expandPool() {
-                const expandSize = 20;
-                for (let i = 0; i < expandSize; i++) {
-                    const element = document.createElement('div');
-                    element.className = 'snowflake';
-                    element.style.display = 'none';
-                    document.body.appendChild(element);
-                    this.pool.push({
-                        element: element,
-                        x: 0,
-                        y: 0,
-                        speed: 0,
-                        size: 0,
-                        opacity: 0,
-                        rotation: 0,
-                        rotationSpeed: 0,
-                        active: false
-                    });
-                }
-            }
-
-            getActiveCount() {
-                return this.activeSnowflakes.size;
-            }
-
-            getPoolSize() {
-                return this.pool.length;
-            }
-
-            clear() {
-                this.activeSnowflakes.forEach(snowflake => {
-                    this.returnSnowflake(snowflake);
-                });
-            }
+            });
+            activeSnowflakes = [];
         }
 
-        // 雪花生成器
-        class SnowflakeGenerator {
-            constructor() {
-                this.config = new SnowflakeConfig();
-                this.pool = new SnowflakePool();
-                this.totalCreated = 0;
-            }
-
-            createSnowflake() {
-                const snowflake = this.pool.getSnowflake();
-                if (!snowflake) return null;
-
-                this.generateRandomConfig(snowflake);
-                this.totalCreated++;
-                return snowflake;
-            }
-
-            generateRandomConfig(snowflake) {
-                const position = this.config.getRandomPosition();
-                snowflake.x = position.x;
-                snowflake.y = position.y;
-                snowflake.speed = this.config.getRandomSpeed();
-                snowflake.size = this.config.getRandomSize();
-                snowflake.opacity = this.config.getRandomOpacity();
-                snowflake.rotation = 0;
-                snowflake.rotationSpeed = (Math.random() - 0.5) * 4;
-
-                const element = snowflake.element;
-                element.textContent = this.config.getRandomShape();
-                element.style.left = snowflake.x + 'px';
-                element.style.top = snowflake.y + 'px';
-                element.style.fontSize = snowflake.size + 'em';
-                element.style.opacity = snowflake.opacity;
-                element.style.color = this.config.getRandomColor();
-                element.style.transform = `rotate(${snowflake.rotation}deg)`;
-            }
-
-            resetSnowflake(snowflake) {
-                const position = this.config.getRandomPosition();
-                snowflake.x = position.x;
-                snowflake.y = position.y;
-                snowflake.rotation = 0;
-                
-                snowflake.element.style.left = snowflake.x + 'px';
-                snowflake.element.style.top = snowflake.y + 'px';
-                snowflake.element.style.transform = `rotate(${snowflake.rotation}deg)`;
-            }
-
-            removeSnowflake(snowflake) {
-                this.pool.returnSnowflake(snowflake);
-            }
-
-            updateSnowflake(snowflake, deltaTime) {
-                if (!snowflake.active) return false;
-
-                snowflake.y += snowflake.speed * deltaTime * 0.1;
-                snowflake.rotation += snowflake.rotationSpeed * deltaTime * 0.1;
-                snowflake.x += Math.sin(snowflake.y * 0.01) * 0.5;
-
-                snowflake.element.style.left = snowflake.x + 'px';
-                snowflake.element.style.top = snowflake.y + 'px';
-                snowflake.element.style.transform = `rotate(${snowflake.rotation}deg)`;
-
-                if (snowflake.y > window.innerHeight + 50) {
-                    this.resetSnowflake(snowflake);
-                }
-
-                return true;
-            }
-
-            getStats() {
-                return {
-                    active: this.pool.getActiveCount(),
-                    poolSize: this.pool.getPoolSize(),
-                    totalCreated: this.totalCreated
-                };
-            }
-
-            clear() {
-                this.pool.clear();
-            }
-        }
-
-        // 雪花系统主控制器
-        class SnowflakeSystem {
-            constructor() {
-                this.generator = new SnowflakeGenerator();
-                this.isRunning = false;
-                this.lastTime = 0;
-                this.animationId = null;
-                this.spawnTimer = 0;
-                this.spawnInterval = 100; // 毫秒
-                
-                this.initControls();
-                this.updateStats();
-            }
-
-            initControls() {
-                const countSlider = document.getElementById('snowflakeCount');
-                const speedSlider = document.getElementById('fallSpeed');
-                const sizeSlider = document.getElementById('snowflakeSize');
-
-                countSlider.addEventListener('input', (e) => {
-                    document.getElementById('countValue').textContent = e.target.value;
-                });
-
-                speedSlider.addEventListener('input', (e) => {
-                    document.getElementById('speedValue').textContent = e.target.value;
-                });
-
-                sizeSlider.addEventListener('input', (e) => {
-                    document.getElementById('sizeValue').textContent = e.target.value;
-                });
-            }
-
-            start() {
-                if (this.isRunning) return;
-                
-                this.isRunning = true;
-                this.lastTime = performance.now();
-                this.animate();
-            }
-
-            stop() {
-                this.isRunning = false;
-                if (this.animationId) {
-                    cancelAnimationFrame(this.animationId);
-                    this.animationId = null;
-                }
-            }
-
-            reset() {
-                this.stop();
-                this.generator.clear();
-                this.generator.totalCreated = 0;
-                this.updateStats();
-            }
-
-            animate(currentTime = performance.now()) {
-                if (!this.isRunning) return;
-
-                const deltaTime = currentTime - this.lastTime;
-                this.lastTime = currentTime;
-
-                // 生成新雪花
-                this.spawnTimer += deltaTime;
-                const maxSnowflakes = parseInt(document.getElementById('snowflakeCount').value);
-                const currentActive = this.generator.getStats().active;
-                
-                if (this.spawnTimer >= this.spawnInterval && currentActive < maxSnowflakes) {
-                    this.generator.createSnowflake();
-                    this.spawnTimer = 0;
-                }
-
-                // 更新所有活跃雪花
-                this.generator.pool.activeSnowflakes.forEach(snowflake => {
-                    this.generator.updateSnowflake(snowflake, deltaTime);
-                });
-
-                this.updateStats();
-                this.animationId = requestAnimationFrame((time) => this.animate(time));
-            }
-
-            updateStats() {
-                const stats = this.generator.getStats();
-                document.getElementById('activeCount').textContent = stats.active;
-                document.getElementById('poolCount').textContent = stats.poolSize - stats.active;
-                document.getElementById('totalCreated').textContent = stats.totalCreated;
-            }
-        }
-
-        // 初始化系统
-        const snowflakeSystem = new SnowflakeSystem();
-        
-        // 窗口大小改变时重新调整
-        window.addEventListener('resize', () => {
-            // 重新调整雪花位置逻辑可以在这里添加
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeControls();
+            // 自动开始下雪
+            setTimeout(() => {
+                startSnowfall();
+            }, 500);
         });
 
-        // 自动启动
-        setTimeout(() => {
-            snowflakeSystem.start();
-        }, 500);
+        // 窗口大小改变时重新调整
+        window.addEventListener('resize', () => {
+            // 重新调整现有雪花的位置范围
+            activeSnowflakes.forEach(snowflake => {
+                const currentLeft = parseFloat(snowflake.style.left);
+                if (currentLeft > window.innerWidth) {
+                    snowflake.style.left = window.innerWidth - 50 + 'px';
+                }
+            });
+        });
     </script>
 </body>
 </html>
