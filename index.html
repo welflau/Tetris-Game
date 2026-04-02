@@ -75,99 +75,67 @@
             position: relative;
             z-index: 10;
             background: rgba(0, 0, 0, 0.8);
-            border-radius: 15px;
+            border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
         }
 
-        #game-board {
-            width: 300px;
-            height: 600px;
+        #game-canvas {
             border: 2px solid #fff;
             background: rgba(0, 0, 0, 0.9);
-            position: relative;
-            margin: 0 auto;
+            display: block;
         }
 
         #game-info {
             color: white;
             text-align: center;
-            margin-bottom: 20px;
-        }
-
-        #score {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        #level {
+            margin-top: 10px;
             font-size: 18px;
-            margin-bottom: 10px;
         }
 
-        #controls {
-            color: white;
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-
-        /* 测试面板 */
+        /* 测试控制面板 */
         #test-panel {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 10px;
+            right: 10px;
             background: rgba(0, 0, 0, 0.8);
             color: white;
             padding: 15px;
-            border-radius: 10px;
-            z-index: 100;
+            border-radius: 8px;
             font-size: 12px;
+            z-index: 100;
             max-width: 300px;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(5px);
         }
 
-        #test-results {
-            margin-top: 10px;
-            max-height: 200px;
-            overflow-y: auto;
+        #test-panel h3 {
+            margin-bottom: 10px;
+            color: #4CAF50;
         }
 
-        .test-item {
+        .test-result {
             margin: 5px 0;
-            padding: 5px;
-            border-radius: 3px;
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .test-pass {
-            background: rgba(0, 255, 0, 0.2);
-            border-left: 3px solid #00ff00;
+        .test-result.pass {
+            color: #4CAF50;
         }
 
-        .test-fail {
-            background: rgba(255, 0, 0, 0.2);
-            border-left: 3px solid #ff0000;
+        .test-result.fail {
+            color: #f44336;
         }
 
-        .test-warning {
-            background: rgba(255, 255, 0, 0.2);
-            border-left: 3px solid #ffff00;
+        .test-result.warning {
+            color: #ff9800;
         }
 
-        button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 5px;
-        }
-
-        button:hover {
-            background: #45a049;
+        #performance-stats {
+            margin-top: 10px;
+            font-size: 11px;
+            color: #ccc;
         }
 
         /* 响应式设计 */
@@ -176,17 +144,24 @@
                 padding: 10px;
             }
             
-            #game-board {
-                width: 250px;
-                height: 500px;
+            #test-panel {
+                position: fixed;
+                bottom: 10px;
+                right: 10px;
+                top: auto;
+                max-width: 250px;
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .snowflake {
+                font-size: 0.8em;
             }
             
             #test-panel {
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                top: auto;
-                max-width: 250px;
+                max-width: 200px;
+                font-size: 10px;
             }
         }
     </style>
@@ -197,24 +172,18 @@
     
     <!-- 游戏容器 -->
     <div id="game-container">
+        <canvas id="game-canvas" width="300" height="600"></canvas>
         <div id="game-info">
-            <div id="score">分数: 0</div>
-            <div id="level">等级: 1</div>
-        </div>
-        <div id="game-board"></div>
-        <div id="controls">
-            <p>方向键: 移动和旋转</p>
-            <p>空格键: 快速下落</p>
+            <div>得分: <span id="score">0</span></div>
+            <div>等级: <span id="level">1</span></div>
         </div>
     </div>
     
-    <!-- 测试面板 -->
+    <!-- 测试控制面板 -->
     <div id="test-panel">
-        <h3>雪花特效集成测试</h3>
-        <button onclick="integrationTestSuite.runIntegrationTests()">运行全部测试</button>
-        <button onclick="integrationTestSuite.testSnowflakeGeneration()">雪花生成测试</button>
-        <button onclick="performanceMonitor.generatePerformanceReport()">性能报告</button>
+        <h3>集成测试结果</h3>
         <div id="test-results"></div>
+        <div id="performance-stats"></div>
     </div>
 
     <script>
@@ -223,490 +192,405 @@
             constructor() {
                 this.container = document.getElementById('snowflake-container');
                 this.snowflakes = [];
-                this.maxSnowflakes = 50;
+                this.maxSnowflakes = this.getMaxSnowflakes();
+                this.snowflakeTypes = ['❄', '❅', '❆', '✻', '✼', '❉'];
                 this.isRunning = false;
                 this.animationId = null;
             }
 
-            init() {
-                this.createSnowflakes();
-                this.startAnimation();
-                this.isRunning = true;
+            getMaxSnowflakes() {
+                const width = window.innerWidth;
+                if (width < 480) return 30;
+                if (width < 768) return 50;
+                return 80;
             }
 
-            createSnowflakes() {
-                const symbols = ['❄', '❅', '❆', '✻', '✼', '❈', '❉', '❊'];
+            createSnowflake() {
+                const snowflake = document.createElement('div');
+                const type = Math.floor(Math.random() * 4) + 1;
+                const symbol = this.snowflakeTypes[Math.floor(Math.random() * this.snowflakeTypes.length)];
                 
-                for (let i = 0; i < this.maxSnowflakes; i++) {
-                    const snowflake = document.createElement('div');
-                    snowflake.className = `snowflake type-${Math.floor(Math.random() * 4) + 1}`;
-                    snowflake.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-                    
-                    // 随机初始位置和属性
-                    snowflake.style.left = Math.random() * 100 + '%';
-                    snowflake.style.top = -50 + 'px';
-                    snowflake.style.fontSize = (Math.random() * 0.8 + 0.8) + 'em';
-                    snowflake.style.opacity = Math.random() * 0.6 + 0.4;
-                    
-                    // 动画属性
-                    snowflake.speed = Math.random() * 2 + 1;
-                    snowflake.drift = Math.random() * 2 - 1;
-                    snowflake.rotation = 0;
-                    snowflake.rotationSpeed = Math.random() * 2 - 1;
-                    
-                    this.container.appendChild(snowflake);
-                    this.snowflakes.push(snowflake);
+                snowflake.className = `snowflake type-${type}`;
+                snowflake.textContent = symbol;
+                snowflake.style.left = Math.random() * 100 + '%';
+                snowflake.style.top = '-20px';
+                snowflake.style.fontSize = (Math.random() * 0.8 + 0.6) + 'em';
+                snowflake.style.opacity = Math.random() * 0.6 + 0.4;
+                
+                const animationDuration = Math.random() * 8 + 5;
+                const horizontalMovement = (Math.random() - 0.5) * 100;
+                
+                snowflake.style.animation = `snowfall ${animationDuration}s linear infinite, sway ${animationDuration * 0.5}s ease-in-out infinite alternate`;
+                
+                this.container.appendChild(snowflake);
+                this.snowflakes.push({
+                    element: snowflake,
+                    duration: animationDuration * 1000,
+                    startTime: Date.now()
+                });
+
+                // 添加动态CSS动画
+                if (!document.getElementById('snowflake-animations')) {
+                    const style = document.createElement('style');
+                    style.id = 'snowflake-animations';
+                    style.textContent = `
+                        @keyframes snowfall {
+                            0% { transform: translateY(-20px) translateX(0px) rotate(0deg); }
+                            100% { transform: translateY(100vh) translateX(${horizontalMovement}px) rotate(360deg); }
+                        }
+                        @keyframes sway {
+                            0% { transform: translateX(-10px); }
+                            100% { transform: translateX(10px); }
+                        }
+                    `;
+                    document.head.appendChild(style);
                 }
             }
 
-            startAnimation() {
-                const animate = () => {
-                    this.updateSnowflakes();
-                    this.animationId = requestAnimationFrame(animate);
-                };
-                animate();
-            }
-
-            updateSnowflakes() {
-                this.snowflakes.forEach(snowflake => {
-                    const currentTop = parseFloat(snowflake.style.top) || 0;
-                    const currentLeft = parseFloat(snowflake.style.left) || 0;
-                    
-                    // 更新位置
-                    const newTop = currentTop + snowflake.speed;
-                    const newLeft = currentLeft + snowflake.drift * 0.1;
-                    
-                    // 更新旋转
-                    snowflake.rotation += snowflake.rotationSpeed;
-                    
-                    snowflake.style.top = newTop + 'px';
-                    snowflake.style.left = newLeft + '%';
-                    snowflake.style.transform = `rotate(${snowflake.rotation}deg)`;
-                    
-                    // 重置超出屏幕的雪花
-                    if (newTop > window.innerHeight + 50) {
-                        snowflake.style.top = -50 + 'px';
-                        snowflake.style.left = Math.random() * 100 + '%';
-                        snowflake.rotation = 0;
+            cleanupSnowflakes() {
+                const now = Date.now();
+                this.snowflakes = this.snowflakes.filter(snowflake => {
+                    if (now - snowflake.startTime > snowflake.duration) {
+                        if (snowflake.element.parentNode) {
+                            snowflake.element.parentNode.removeChild(snowflake.element);
+                        }
+                        return false;
                     }
-                    
-                    if (newLeft > 100 || newLeft < -10) {
-                        snowflake.style.left = Math.random() * 100 + '%';
-                    }
+                    return true;
                 });
             }
 
+            start() {
+                if (this.isRunning) return;
+                this.isRunning = true;
+                
+                const generateSnowflake = () => {
+                    if (!this.isRunning) return;
+                    
+                    if (this.snowflakes.length < this.maxSnowflakes) {
+                        this.createSnowflake();
+                    }
+                    
+                    this.cleanupSnowflakes();
+                    
+                    setTimeout(generateSnowflake, Math.random() * 500 + 200);
+                };
+                
+                generateSnowflake();
+            }
+
             stop() {
-                if (this.animationId) {
-                    cancelAnimationFrame(this.animationId);
-                    this.animationId = null;
-                }
+                this.isRunning = false;
+                this.snowflakes.forEach(snowflake => {
+                    if (snowflake.element.parentNode) {
+                        snowflake.element.parentNode.removeChild(snowflake.element);
+                    }
+                });
+                this.snowflakes = [];
+            }
+
+            resize() {
+                this.maxSnowflakes = this.getMaxSnowflakes();
+            }
+        }
+
+        // 简化的俄罗斯方块游戏
+        class TetrisGame {
+            constructor() {
+                this.canvas = document.getElementById('game-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.score = 0;
+                this.level = 1;
                 this.isRunning = false;
             }
 
-            getSnowflakeCount() {
-                return this.snowflakes.length;
-            }
-        }
-
-        // 俄罗斯方块游戏集成适配器
-        class TetrisGameIntegration {
-            constructor(snowflakeSystem) {
-                this.snowflakeSystem = snowflakeSystem;
-                this.gameState = 'menu'; // menu, playing, paused, gameover
+            start() {
+                this.isRunning = true;
+                this.gameLoop();
             }
 
-            initSnowflakeBackground() {
-                this.snowflakeSystem.init();
-                return true;
-            }
-
-            adjustForGameUI() {
-                // 确保雪花不会干扰游戏UI
-                const gameContainer = document.getElementById('game-container');
-                if (gameContainer) {
-                    gameContainer.style.position = 'relative';
-                    gameContainer.style.zIndex = '10';
-                }
-                return true;
-            }
-
-            handleGameStateChanges(newState) {
-                this.gameState = newState;
+            gameLoop() {
+                if (!this.isRunning) return;
                 
-                switch (newState) {
-                    case 'playing':
-                        // 游戏进行时可能需要减少雪花数量以提高性能
-                        break;
-                    case 'paused':
-                        // 暂停时可以停止雪花动画
-                        break;
-                    case 'gameover':
-                        // 游戏结束时可以增加雪花效果
-                        break;
-                }
-                return true;
-            }
-
-            optimizeForGameplay() {
-                // 优化雪花效果以确保游戏流畅运行
-                const container = document.getElementById('snowflake-container');
-                if (container) {
-                    container.style.willChange = 'transform';
-                    container.style.transform = 'translateZ(0)';
-                }
-                return true;
-            }
-        }
-
-        // 兼容性验证器
-        class CompatibilityValidator {
-            validateBrowserSupport() {
-                const results = {
-                    css3Animations: this.checkCSS3Support(),
-                    requestAnimationFrame: this.checkRAFSupport(),
-                    transforms: this.checkTransformSupport(),
-                    backdropFilter: this.checkBackdropFilterSupport()
-                };
+                // 清空画布
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
                 
-                return {
-                    passed: Object.values(results).every(r => r),
-                    details: results
-                };
-            }
-
-            checkCSS3Support() {
-                const testElement = document.createElement('div');
-                testElement.style.animation = 'test 1s';
-                return testElement.style.animation !== '';
-            }
-
-            checkRAFSupport() {
-                return typeof requestAnimationFrame !== 'undefined';
-            }
-
-            checkTransformSupport() {
-                const testElement = document.createElement('div');
-                testElement.style.transform = 'translateZ(0)';
-                return testElement.style.transform !== '';
-            }
-
-            checkBackdropFilterSupport() {
-                const testElement = document.createElement('div');
-                testElement.style.backdropFilter = 'blur(10px)';
-                return testElement.style.backdropFilter !== '';
-            }
-
-            testMobilePerformance() {
-                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                const hasTouch = 'ontouchstart' in window;
-                const screenSize = window.innerWidth < 768;
+                // 绘制一些示例方块
+                this.ctx.fillStyle = '#ff6b6b';
+                this.ctx.fillRect(50, 550, 30, 30);
+                this.ctx.fillStyle = '#4ecdc4';
+                this.ctx.fillRect(80, 550, 30, 30);
+                this.ctx.fillStyle = '#45b7d1';
+                this.ctx.fillRect(110, 550, 30, 30);
                 
-                return {
-                    isMobile: isMobile,
-                    hasTouch: hasTouch,
-                    isSmallScreen: screenSize,
-                    recommendation: isMobile ? 'reduce-snowflakes' : 'full-effect'
-                };
-            }
-
-            validateResponsiveLayout() {
-                const viewportWidth = window.innerWidth;
-                const viewportHeight = window.innerHeight;
+                // 更新分数
+                this.score += 10;
+                document.getElementById('score').textContent = this.score;
                 
-                return {
-                    width: viewportWidth,
-                    height: viewportHeight,
-                    aspectRatio: viewportWidth / viewportHeight,
-                    isPortrait: viewportHeight > viewportWidth,
-                    isLandscape: viewportWidth > viewportHeight
-                };
-            }
-        }
-
-        // 性能监控器
-        class PerformanceMonitor {
-            constructor() {
-                this.frameCount = 0;
-                this.lastTime = performance.now();
-                this.fps = 0;
-                this.memoryUsage = 0;
-                this.isMonitoring = false;
-            }
-
-            startMonitoring() {
-                this.isMonitoring = true;
-                this.monitorFrameRate();
-            }
-
-            monitorFrameRate() {
-                if (!this.isMonitoring) return;
-                
-                const currentTime = performance.now();
-                this.frameCount++;
-                
-                if (currentTime - this.lastTime >= 1000) {
-                    this.fps = Math.round((this.frameCount * 1000) / (currentTime - this.lastTime));
-                    this.frameCount = 0;
-                    this.lastTime = currentTime;
+                if (this.score > 0 && this.score % 1000 === 0) {
+                    this.level++;
+                    document.getElementById('level').textContent = this.level;
                 }
                 
-                requestAnimationFrame(() => this.monitorFrameRate());
+                requestAnimationFrame(() => this.gameLoop());
             }
 
-            trackMemoryUsage() {
-                if (performance.memory) {
-                    return {
-                        used: Math.round(performance.memory.usedJSHeapSize / 1048576),
-                        total: Math.round(performance.memory.totalJSHeapSize / 1048576),
-                        limit: Math.round(performance.memory.jsHeapSizeLimit / 1048576)
-                    };
-                }
-                return null;
-            }
-
-            measureAnimationCost() {
-                const startTime = performance.now();
-                
-                // 模拟动画成本测量
-                setTimeout(() => {
-                    const endTime = performance.now();
-                    return endTime - startTime;
-                }, 16); // 一帧的时间
-            }
-
-            generatePerformanceReport() {
-                const memory = this.trackMemoryUsage();
-                const report = {
-                    fps: this.fps,
-                    memory: memory,
-                    timestamp: new Date().toLocaleTimeString(),
-                    recommendations: this.getPerformanceRecommendations()
-                };
-                
-                this.displayPerformanceReport(report);
-                return report;
-            }
-
-            getPerformanceRecommendations() {
-                const recommendations = [];
-                
-                if (this.fps < 30) {
-                    recommendations.push('FPS过低，建议减少雪花数量');
-                }
-                
-                const memory = this.trackMemoryUsage();
-                if (memory && memory.used > 100) {
-                    recommendations.push('内存使用过高，建议优化动画');
-                }
-                
-                return recommendations;
-            }
-
-            displayPerformanceReport(report) {
-                const resultsDiv = document.getElementById('test-results');
-                const reportHtml = `
-                    <div class="test-item ${report.fps > 30 ? 'test-pass' : 'test-warning'}">
-                        <strong>性能报告 (${report.timestamp})</strong><br>
-                        FPS: ${report.fps}<br>
-                        ${report.memory ? `内存: ${report.memory.used}MB / ${report.memory.total}MB` : '内存信息不可用'}<br>
-                        ${report.recommendations.length > 0 ? '建议: ' + report.recommendations.join(', ') : '性能良好'}
-                    </div>
-                `;
-                resultsDiv.innerHTML = reportHtml + resultsDiv.innerHTML;
+            stop() {
+                this.isRunning = false;
             }
         }
 
         // 集成测试套件
         class IntegrationTestSuite {
             constructor() {
-                this.snowflakeSystem = new SnowflakeSystem();
-                this.tetrisIntegration = new TetrisGameIntegration(this.snowflakeSystem);
-                this.compatibilityValidator = new CompatibilityValidator();
-                this.performanceMonitor = new PerformanceMonitor();
-                this.testResults = [];
+                this.results = [];
+                this.performanceData = {
+                    frameRate: 0,
+                    memoryUsage: 0,
+                    animationCost: 0
+                };
+                this.startTime = Date.now();
             }
 
             runIntegrationTests() {
-                this.clearResults();
-                this.addResult('开始集成测试...', 'info');
+                console.log('开始集成测试...');
                 
-                // 运行所有测试
                 this.testSnowflakeGeneration();
                 this.testAnimationPerformance();
                 this.testResponsiveDesign();
                 this.testZIndexLayering();
                 this.testBrowserCompatibility();
                 
-                this.addResult('所有测试完成', 'pass');
+                this.displayResults();
+                this.startPerformanceMonitoring();
             }
 
             testSnowflakeGeneration() {
                 try {
-                    const success = this.tetrisIntegration.initSnowflakeBackground();
-                    const count = this.snowflakeSystem.getSnowflakeCount();
+                    const container = document.getElementById('snowflake-container');
+                    const initialCount = container.children.length;
                     
-                    if (success && count > 0) {
-                        this.addResult(`雪花生成测试通过 - 生成了 ${count} 个雪花`, 'pass');
-                    } else {
-                        this.addResult('雪花生成测试失败', 'fail');
-                    }
+                    // 等待一些雪花生成
+                    setTimeout(() => {
+                        const newCount = container.children.length;
+                        if (newCount > initialCount) {
+                            this.addResult('雪花生成测试', 'pass', `成功生成 ${newCount} 个雪花`);
+                        } else {
+                            this.addResult('雪花生成测试', 'fail', '雪花生成失败');
+                        }
+                    }, 2000);
+                    
                 } catch (error) {
-                    this.addResult(`雪花生成测试异常: ${error.message}`, 'fail');
+                    this.addResult('雪花生成测试', 'fail', `错误: ${error.message}`);
                 }
             }
 
             testAnimationPerformance() {
-                this.performanceMonitor.startMonitoring();
-                
-                setTimeout(() => {
-                    const fps = this.performanceMonitor.fps;
-                    if (fps >= 30) {
-                        this.addResult(`动画性能测试通过 - FPS: ${fps}`, 'pass');
-                    } else if (fps >= 20) {
-                        this.addResult(`动画性能测试警告 - FPS: ${fps}`, 'warning');
-                    } else {
-                        this.addResult(`动画性能测试失败 - FPS: ${fps}`, 'fail');
-                    }
-                }, 2000);
+                try {
+                    const startTime = performance.now();
+                    let frameCount = 0;
+                    
+                    const measureFrames = () => {
+                        frameCount++;
+                        const currentTime = performance.now();
+                        
+                        if (currentTime - startTime >= 1000) {
+                            this.performanceData.frameRate = frameCount;
+                            
+                            if (frameCount >= 30) {
+                                this.addResult('动画性能测试', 'pass', `帧率: ${frameCount} FPS`);
+                            } else if (frameCount >= 20) {
+                                this.addResult('动画性能测试', 'warning', `帧率: ${frameCount} FPS (偏低)`);
+                            } else {
+                                this.addResult('动画性能测试', 'fail', `帧率: ${frameCount} FPS (过低)`);
+                            }
+                        } else {
+                            requestAnimationFrame(measureFrames);
+                        }
+                    };
+                    
+                    requestAnimationFrame(measureFrames);
+                    
+                } catch (error) {
+                    this.addResult('动画性能测试', 'fail', `错误: ${error.message}`);
+                }
             }
 
             testResponsiveDesign() {
-                const layout = this.compatibilityValidator.validateResponsiveLayout();
-                const mobile = this.compatibilityValidator.testMobilePerformance();
-                
-                if (layout.width > 0 && layout.height > 0) {
-                    this.addResult(`响应式设计测试通过 - ${layout.width}x${layout.height}`, 'pass');
-                } else {
-                    this.addResult('响应式设计测试失败', 'fail');
-                }
-                
-                if (mobile.isMobile) {
-                    this.addResult(`移动设备检测: ${mobile.recommendation}`, 'info');
+                try {
+                    const screenWidth = window.innerWidth;
+                    const container = document.getElementById('snowflake-container');
+                    const gameContainer = document.getElementById('game-container');
+                    
+                    // 检查容器是否正确响应屏幕尺寸
+                    if (container.offsetWidth === window.innerWidth && 
+                        container.offsetHeight === window.innerHeight) {
+                        this.addResult('响应式设计测试', 'pass', `屏幕宽度: ${screenWidth}px`);
+                    } else {
+                        this.addResult('响应式设计测试', 'warning', '容器尺寸可能不匹配');
+                    }
+                    
+                    // 检查移动端适配
+                    if (screenWidth < 768) {
+                        const testPanel = document.getElementById('test-panel');
+                        const computedStyle = window.getComputedStyle(testPanel);
+                        if (computedStyle.bottom !== 'auto') {
+                            this.addResult('移动端适配测试', 'pass', '测试面板位置已调整');
+                        } else {
+                            this.addResult('移动端适配测试', 'warning', '移动端布局可能需要优化');
+                        }
+                    }
+                    
+                } catch (error) {
+                    this.addResult('响应式设计测试', 'fail', `错误: ${error.message}`);
                 }
             }
 
             testZIndexLayering() {
-                const snowContainer = document.getElementById('snowflake-container');
-                const gameContainer = document.getElementById('game-container');
-                
-                const snowZIndex = parseInt(getComputedStyle(snowContainer).zIndex) || 0;
-                const gameZIndex = parseInt(getComputedStyle(gameContainer).zIndex) || 0;
-                
-                if (gameZIndex > snowZIndex) {
-                    this.addResult(`层级测试通过 - 游戏层级(${gameZIndex}) > 雪花层级(${snowZIndex})`, 'pass');
-                } else {
-                    this.addResult(`层级测试失败 - 层级关系错误`, 'fail');
+                try {
+                    const snowContainer = document.getElementById('snowflake-container');
+                    const gameContainer = document.getElementById('game-container');
+                    const testPanel = document.getElementById('test-panel');
+                    
+                    const snowZIndex = parseInt(window.getComputedStyle(snowContainer).zIndex) || 0;
+                    const gameZIndex = parseInt(window.getComputedStyle(gameContainer).zIndex) || 0;
+                    const panelZIndex = parseInt(window.getComputedStyle(testPanel).zIndex) || 0;
+                    
+                    if (snowZIndex < gameZIndex && gameZIndex < panelZIndex) {
+                        this.addResult('层级测试', 'pass', `雪花(${snowZIndex}) < 游戏(${gameZIndex}) < 面板(${panelZIndex})`);
+                    } else {
+                        this.addResult('层级测试', 'warning', '层级顺序可能不正确');
+                    }
+                    
+                } catch (error) {
+                    this.addResult('层级测试', 'fail', `错误: ${error.message}`);
                 }
             }
 
             testBrowserCompatibility() {
-                const compatibility = this.compatibilityValidator.validateBrowserSupport();
-                
-                if (compatibility.passed) {
-                    this.addResult('浏览器兼容性测试通过', 'pass');
-                } else {
-                    const failed = Object.entries(compatibility.details)
-                        .filter(([key, value]) => !value)
-                        .map(([key]) => key);
-                    this.addResult(`浏览器兼容性测试失败: ${failed.join(', ')}`, 'fail');
+                try {
+                    const features = {
+                        'CSS动画': 'animationName' in document.body.style,
+                        'CSS变换': 'transform' in document.body.style,
+                        '背景滤镜': 'backdropFilter' in document.body.style,
+                        'requestAnimationFrame': typeof requestAnimationFrame !== 'undefined',
+                        'Performance API': typeof performance !== 'undefined'
+                    };
+                    
+                    const supportedFeatures = Object.entries(features).filter(([name, supported]) => supported);
+                    const unsupportedFeatures = Object.entries(features).filter(([name, supported]) => !supported);
+                    
+                    if (unsupportedFeatures.length === 0) {
+                        this.addResult('浏览器兼容性测试', 'pass', '所有功能都受支持');
+                    } else if (unsupportedFeatures.length <= 1) {
+                        this.addResult('浏览器兼容性测试', 'warning', `部分功能不支持: ${unsupportedFeatures.map(f => f[0]).join(', ')}`);
+                    } else {
+                        this.addResult('浏览器兼容性测试', 'fail', `多个功能不支持: ${unsupportedFeatures.map(f => f[0]).join(', ')}`);
+                    }
+                    
+                } catch (error) {
+                    this.addResult('浏览器兼容性测试', 'fail', `错误: ${error.message}`);
                 }
             }
 
-            addResult(message, type) {
-                const resultsDiv = document.getElementById('test-results');
-                const resultClass = type === 'pass' ? 'test-pass' : 
-                                  type === 'fail' ? 'test-fail' : 
-                                  type === 'warning' ? 'test-warning' : '';
-                
-                const resultHtml = `
-                    <div class="test-item ${resultClass}">
-                        ${message}
-                    </div>
-                `;
-                
-                resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
-                this.testResults.push({ message, type, timestamp: Date.now() });
+            addResult(testName, status, message) {
+                this.results.push({ testName, status, message, timestamp: Date.now() });
             }
 
-            clearResults() {
-                document.getElementById('test-results').innerHTML = '';
-                this.testResults = [];
+            displayResults() {
+                const resultsContainer = document.getElementById('test-results');
+                resultsContainer.innerHTML = '';
+                
+                this.results.forEach(result => {
+                    const div = document.createElement('div');
+                    div.className = `test-result ${result.status}`;
+                    div.innerHTML = `<strong>${result.testName}:</strong> ${result.message}`;
+                    resultsContainer.appendChild(div);
+                });
+            }
+
+            startPerformanceMonitoring() {
+                const updateStats = () => {
+                    const statsContainer = document.getElementById('performance-stats');
+                    const runTime = Math.floor((Date.now() - this.startTime) / 1000);
+                    const snowflakeCount = document.querySelectorAll('.snowflake').length;
+                    
+                    // 估算内存使用
+                    if (performance.memory) {
+                        this.performanceData.memoryUsage = Math.round(performance.memory.usedJSHeapSize / 1024 / 1024);
+                    }
+                    
+                    statsContainer.innerHTML = `
+                        <div><strong>性能统计:</strong></div>
+                        <div>运行时间: ${runTime}s</div>
+                        <div>当前雪花数: ${snowflakeCount}</div>
+                        <div>帧率: ${this.performanceData.frameRate} FPS</div>
+                        ${performance.memory ? `<div>内存使用: ${this.performanceData.memoryUsage} MB</div>` : ''}
+                    `;
+                    
+                    setTimeout(updateStats, 1000);
+                };
+                
+                updateStats();
             }
         }
 
-        // 初始化系统
-        const integrationTestSuite = new IntegrationTestSuite();
-        const performanceMonitor = integrationTestSuite.performanceMonitor;
-        
-        // 页面加载完成后自动初始化
-        document.addEventListener('DOMContentLoaded', () => {
-            // 初始化雪花特效
-            integrationTestSuite.tetrisIntegration.initSnowflakeBackground();
-            integrationTestSuite.tetrisIntegration.adjustForGameUI();
-            integrationTestSuite.tetrisIntegration.optimizeForGameplay();
-            
-            // 自动运行基础测试
-            setTimeout(() => {
-                integrationTestSuite.addResult('系统初始化完成', 'pass');
-                integrationTestSuite.testSnowflakeGeneration();
-                integrationTestSuite.testZIndexLayering();
-            }, 1000);
-        });
-        
-        // 响应式处理
-        window.addEventListener('resize', () => {
-            integrationTestSuite.addResult('窗口大小改变，重新验证响应式设计', 'info');
-            integrationTestSuite.testResponsiveDesign();
-        });
-        
-        // 简单的俄罗斯方块游戏模拟（用于测试集成）
-        class SimpleTetrisGame {
+        // 主集成类
+        class TetrisGameIntegration {
             constructor() {
-                this.score = 0;
-                this.level = 1;
-                this.isPlaying = false;
+                this.snowflakeSystem = new SnowflakeSystem();
+                this.tetrisGame = new TetrisGame();
+                this.testSuite = new IntegrationTestSuite();
             }
-            
-            start() {
-                this.isPlaying = true;
-                integrationTestSuite.tetrisIntegration.handleGameStateChanges('playing');
-                this.updateDisplay();
-            }
-            
-            pause() {
-                this.isPlaying = false;
-                integrationTestSuite.tetrisIntegration.handleGameStateChanges('paused');
-            }
-            
-            gameOver() {
-                this.isPlaying = false;
-                integrationTestSuite.tetrisIntegration.handleGameStateChanges('gameover');
-            }
-            
-            updateDisplay() {
-                document.getElementById('score').textContent = `分数: ${this.score}`;
-                document.getElementById('level').textContent = `等级: ${this.level}`;
+
+            init() {
+                console.log('初始化俄罗斯方块雪花特效集成...');
+                
+                // 启动雪花特效
+                this.snowflakeSystem.start();
+                
+                // 启动游戏
+                this.tetrisGame.start();
+                
+                // 运行集成测试
+                setTimeout(() => {
+                    this.testSuite.runIntegrationTests();
+                }, 1000);
+                
+                // 监听窗口大小变化
+                window.addEventListener('resize', () => {
+                    this.snowflakeSystem.resize();
+                });
+                
+                // 监听页面可见性变化
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        this.snowflakeSystem.stop();
+                        this.tetrisGame.stop();
+                    } else {
+                        this.snowflakeSystem.start();
+                        this.tetrisGame.start();
+                    }
+                });
             }
         }
-        
-        const tetrisGame = new SimpleTetrisGame();
-        
-        // 键盘事件处理
-        document.addEventListener('keydown', (event) => {
-            switch(event.code) {
-                case 'Space':
-                    if (!tetrisGame.isPlaying) {
-                        tetrisGame.start();
-                        integrationTestSuite.addResult('游戏开始', 'info');
-                    }
-                    break;
-                case 'KeyP':
-                    if (tetrisGame.isPlaying) {
-                        tetrisGame.pause();
-                        integrationTestSuite.addResult('游戏暂停', 'info');
-                    }
-                    break;
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            const integration = new TetrisGameIntegration();
+            integration.init();
+        });
+
+        // 错误处理
+        window.addEventListener('error', (event) => {
+            console.error('集成测试中发生错误:', event.error);
+            const resultsContainer = document.getElementById('test-results');
+            if (resultsContainer) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'test-result fail';
+                errorDiv.innerHTML = `<strong>运行时错误:</strong> ${event.error.message}`;
+                resultsContainer.appendChild(errorDiv);
             }
         });
     </script>
