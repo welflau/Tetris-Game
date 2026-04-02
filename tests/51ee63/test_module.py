@@ -2,93 +2,77 @@ import pytest
 from pathlib import Path
 import re
 
-class TestSnowflakeEffectProject:
-    """雪花特效技术方案设计项目测试类"""
+class TestSnowflakeGeneratorFrontend:
     
-    def test_html_file_exists(self):
-        """测试HTML文件是否存在"""
-        html_file = Path("design/index.html")
-        assert html_file.exists(), f"HTML文件不存在: {html_file}"
-        assert html_file.is_file(), f"路径不是文件: {html_file}"
+    def test_index_html_file_exists(self):
+        """测试 index.html 文件是否存在"""
+        frontend_dir = Path("frontend")
+        index_file = frontend_dir / "index.html"
+        assert index_file.exists(), f"index.html 文件不存在于 {frontend_dir} 目录中"
+        assert index_file.is_file(), "index.html 应该是一个文件而不是目录"
     
-    def test_html_contains_snowflake_elements(self):
-        """测试HTML文件是否包含雪花特效相关的关键元素"""
-        html_file = Path("design/index.html")
+    def test_index_html_contains_snowflake_elements(self):
+        """测试 index.html 是否包含雪花生成器相关的关键元素"""
+        frontend_dir = Path("frontend")
+        index_file = frontend_dir / "index.html"
         
-        if not html_file.exists():
-            pytest.skip("HTML文件不存在，跳过内容测试")
-        
-        content = html_file.read_text(encoding='utf-8')
+        with open(index_file, 'r', encoding='utf-8') as f:
+            content = f.read()
         
         # 检查基本HTML结构
-        assert '<html' in content.lower(), "HTML文件缺少html标签"
-        assert '<head>' in content.lower() or '<head ' in content.lower(), "HTML文件缺少head标签"
-        assert '<body>' in content.lower() or '<body ' in content.lower(), "HTML文件缺少body标签"
+        assert '<html' in content.lower(), "HTML文件应包含html标签"
+        assert '<head>' in content.lower() or '<head ' in content.lower(), "HTML文件应包含head标签"
+        assert '<body>' in content.lower() or '<body ' in content.lower(), "HTML文件应包含body标签"
         
-        # 检查雪花特效相关元素（至少包含其中一项）
-        snowflake_indicators = [
-            'snowflake',
-            'snow',
-            'canvas',
-            'animation',
-            'particle'
+        # 检查雪花生成器相关元素
+        snowflake_keywords = ['snowflake', '雪花', 'generator', '生成器', 'id']
+        has_snowflake_content = any(keyword in content.lower() for keyword in snowflake_keywords)
+        assert has_snowflake_content, "HTML文件应包含雪花生成器相关的关键词"
+    
+    def test_index_html_has_interactive_elements(self):
+        """测试 index.html 是否包含交互元素用于雪花ID生成"""
+        frontend_dir = Path("frontend")
+        index_file = frontend_dir / "index.html"
+        
+        with open(index_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # 检查是否包含按钮或输入框等交互元素
+        interactive_elements = [
+            r'<button[^>]*>',
+            r'<input[^>]*>',
+            r'<div[^>]*id[^>]*>',
+            r'onclick\s*=',
+            r'<script[^>]*>'
         ]
         
-        has_snowflake_element = any(indicator in content.lower() for indicator in snowflake_indicators)
-        assert has_snowflake_element, "HTML文件中未找到雪花特效相关元素"
+        has_interactive = any(re.search(pattern, content, re.IGNORECASE) for pattern in interactive_elements)
+        assert has_interactive, "HTML文件应包含按钮、输入框或脚本等交互元素"
     
-    def test_dev_notes_file_exists_and_valid(self):
-        """测试开发文档是否存在且包含有效内容"""
-        dev_notes_file = Path("design/docs/51ee63/b8d19f/dev-notes.md")
+    def test_dev_notes_file_exists_and_readable(self):
+        """测试开发文档是否存在且可读"""
+        docs_path = Path("docs/51ee63/cfce01/dev-notes.md")
+        assert docs_path.exists(), f"开发文档不存在于 {docs_path}"
+        assert docs_path.is_file(), "dev-notes.md 应该是一个文件"
         
-        assert dev_notes_file.exists(), f"开发文档不存在: {dev_notes_file}"
-        assert dev_notes_file.is_file(), f"路径不是文件: {dev_notes_file}"
+        # 测试文件是否可读且不为空
+        with open(docs_path, 'r', encoding='utf-8') as f:
+            content = f.read()
         
-        content = dev_notes_file.read_text(encoding='utf-8')
-        assert len(content.strip()) > 0, "开发文档内容为空"
-        
-        # 检查是否包含技术方案相关内容
-        technical_keywords = [
-            '技术',
-            '方案',
-            '设计',
-            '实现',
-            '雪花',
-            'snowflake',
-            'canvas',
-            'javascript',
-            'css',
-            'animation'
-        ]
-        
-        has_technical_content = any(keyword in content.lower() for keyword in technical_keywords)
-        assert has_technical_content, "开发文档中未找到技术方案相关内容"
+        assert len(content.strip()) > 0, "开发文档不应为空"
+        assert any(keyword in content.lower() for keyword in ['snowflake', '雪花', 'frontend', '前端']), \
+            "开发文档应包含项目相关内容"
     
-    def test_project_structure_integrity(self):
-        """测试项目结构完整性"""
-        design_dir = Path("design")
-        assert design_dir.exists(), "design目录不存在"
-        assert design_dir.is_dir(), "design路径不是目录"
+    def test_frontend_directory_structure(self):
+        """测试前端目录结构是否合理"""
+        frontend_dir = Path("frontend")
+        assert frontend_dir.exists(), "frontend 目录应该存在"
+        assert frontend_dir.is_dir(), "frontend 应该是一个目录"
         
-        docs_dir = Path("design/docs")
-        if docs_dir.exists():
-            assert docs_dir.is_dir(), "docs路径不是目录"
-    
-    def test_html_syntax_basic_validation(self):
-        """测试HTML文件基本语法有效性"""
-        html_file = Path("design/index.html")
+        # 检查是否有其他常见的前端文件
+        files_in_frontend = list(frontend_dir.iterdir())
+        assert len(files_in_frontend) > 0, "frontend 目录不应为空"
         
-        if not html_file.exists():
-            pytest.skip("HTML文件不存在，跳过语法测试")
-        
-        content = html_file.read_text(encoding='utf-8')
-        
-        # 基本语法检查
-        open_tags = re.findall(r'<(\w+)[^>]*>', content)
-        close_tags = re.findall(r'</(\w+)>', content)
-        
-        # 检查关键标签是否配对
-        critical_tags = ['html', 'head', 'body']
-        for tag in critical_tags:
-            if tag in open_tags:
-                assert tag in close_tags, f"标签 {tag} 没有正确闭合"
+        # 检查 index.html 是否在文件列表中
+        html_files = [f for f in files_in_frontend if f.suffix == '.html']
+        assert len(html_files) >= 1, "frontend 目录应至少包含一个HTML文件"
