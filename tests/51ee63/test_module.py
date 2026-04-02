@@ -2,90 +2,71 @@ import pytest
 from pathlib import Path
 import re
 
-class TestSnowflakeDesignProject:
-    """雪花视觉素材准备项目测试类"""
+class TestSnowflakeAnimationFrontend:
     
-    @pytest.fixture
-    def project_root(self):
-        """获取项目根目录"""
-        return Path(__file__).parent
+    def test_index_html_file_exists(self):
+        """测试 index.html 文件是否存在"""
+        index_file = Path("frontend/index.html")
+        assert index_file.exists(), "index.html 文件不存在"
+        assert index_file.is_file(), "index.html 不是一个有效的文件"
     
-    def test_html_file_exists(self, project_root):
-        """测试HTML文件是否存在"""
-        html_file = project_root / "design" / "index.html"
-        assert html_file.exists(), f"HTML文件不存在: {html_file}"
-        assert html_file.is_file(), f"路径不是文件: {html_file}"
-    
-    def test_html_content_structure(self, project_root):
-        """测试HTML文件内容包含必要的雪花设计元素"""
-        html_file = project_root / "design" / "index.html"
-        
-        if not html_file.exists():
-            pytest.skip("HTML文件不存在，跳过内容测试")
-        
-        content = html_file.read_text(encoding='utf-8')
+    def test_index_html_contains_essential_elements(self):
+        """测试 index.html 文件包含雪花动画必需的HTML元素"""
+        index_file = Path("frontend/index.html")
+        content = index_file.read_text(encoding='utf-8')
         
         # 检查基本HTML结构
-        assert '<html' in content.lower(), "HTML文件缺少html标签"
-        assert '<head>' in content.lower(), "HTML文件缺少head标签"
-        assert '<body>' in content.lower(), "HTML文件缺少body标签"
+        assert "<html" in content.lower(), "缺少 html 标签"
+        assert "<head>" in content.lower(), "缺少 head 标签"
+        assert "<body>" in content.lower(), "缺少 body 标签"
         
-        # 检查雪花相关元素
-        snowflake_keywords = ['snowflake', '雪花', 'snow', 'crystal', '晶体']
-        has_snowflake_content = any(keyword in content.lower() for keyword in snowflake_keywords)
-        assert has_snowflake_content, "HTML内容中未找到雪花相关关键词"
+        # 检查雪花动画相关元素
+        assert "canvas" in content.lower() or "div" in content.lower(), "缺少动画容器元素"
+        assert "script" in content.lower() or ".js" in content, "缺少JavaScript脚本引用"
     
-    def test_dev_notes_documentation(self, project_root):
-        """测试开发文档是否存在且包含有效内容"""
-        dev_notes_file = project_root / "docs" / "51ee63" / "327d7d" / "dev-notes.md"
+    def test_index_html_contains_snowflake_animation_keywords(self):
+        """测试 index.html 文件包含雪花动画相关的关键词或样式"""
+        index_file = Path("frontend/index.html")
+        content = index_file.read_text(encoding='utf-8')
         
-        assert dev_notes_file.exists(), f"开发文档不存在: {dev_notes_file}"
-        assert dev_notes_file.is_file(), f"路径不是文件: {dev_notes_file}"
+        # 检查雪花动画相关关键词（不区分大小写）
+        snowflake_keywords = [
+            "snow", "snowflake", "animation", "canvas", 
+            "particle", "winter", "flake", "falling"
+        ]
         
+        content_lower = content.lower()
+        found_keywords = [keyword for keyword in snowflake_keywords if keyword in content_lower]
+        
+        assert len(found_keywords) > 0, f"HTML文件中未找到雪花动画相关关键词，期望包含: {snowflake_keywords}"
+    
+    def test_dev_notes_file_exists_and_readable(self):
+        """测试开发文档文件是否存在且可读"""
+        dev_notes_file = Path("docs/51ee63/9cdd70/dev-notes.md")
+        assert dev_notes_file.exists(), "开发文档 dev-notes.md 文件不存在"
+        assert dev_notes_file.is_file(), "dev-notes.md 不是一个有效的文件"
+        
+        # 测试文件是否可读且不为空
         content = dev_notes_file.read_text(encoding='utf-8')
-        assert len(content.strip()) > 0, "开发文档内容为空"
-        
-        # 检查是否包含开发相关内容
-        dev_keywords = ['开发', 'development', '设计', 'design', '雪花', 'snowflake', '素材', 'material']
-        has_dev_content = any(keyword in content.lower() for keyword in dev_keywords)
-        assert has_dev_content, "开发文档中未找到相关开发内容"
+        assert len(content.strip()) > 0, "开发文档文件为空"
     
-    def test_project_structure_integrity(self, project_root):
-        """测试项目目录结构完整性"""
-        design_dir = project_root / "design"
-        docs_dir = project_root / "docs"
+    def test_dev_notes_contains_project_documentation(self):
+        """测试开发文档包含项目相关的文档内容"""
+        dev_notes_file = Path("docs/51ee63/9cdd70/dev-notes.md")
+        content = dev_notes_file.read_text(encoding='utf-8')
         
-        assert design_dir.exists(), "design目录不存在"
-        assert design_dir.is_dir(), "design路径不是目录"
+        # 检查Markdown格式标识
+        markdown_indicators = ["#", "##", "###", "*", "-", "`"]
+        has_markdown = any(indicator in content for indicator in markdown_indicators)
+        assert has_markdown, "开发文档似乎不是有效的Markdown格式"
         
-        assert docs_dir.exists(), "docs目录不存在"
-        assert docs_dir.is_dir(), "docs路径不是目录"
+        # 检查项目相关关键词
+        project_keywords = [
+            "雪花", "动画", "snowflake", "animation", "frontend", 
+            "开发", "功能", "实现", "设计"
+        ]
         
-        # 检查docs子目录结构
-        docs_subdir = docs_dir / "51ee63" / "327d7d"
-        assert docs_subdir.exists(), "docs子目录结构不完整"
-        assert docs_subdir.is_dir(), "docs子目录路径不是目录"
-    
-    def test_html_file_encoding_and_format(self, project_root):
-        """测试HTML文件编码和格式正确性"""
-        html_file = project_root / "design" / "index.html"
+        content_lower = content.lower()
+        found_keywords = [keyword for keyword in project_keywords if keyword.lower() in content_lower]
         
-        if not html_file.exists():
-            pytest.skip("HTML文件不存在，跳过编码测试")
-        
-        try:
-            content = html_file.read_text(encoding='utf-8')
-        except UnicodeDecodeError:
-            pytest.fail("HTML文件编码不是UTF-8或存在编码问题")
-        
-        # 检查HTML文档类型声明
-        has_doctype = content.strip().lower().startswith('<!doctype') or '<html' in content.lower()
-        assert has_doctype, "HTML文件缺少文档类型声明"
-        
-        # 检查是否有基本的meta标签
-        meta_pattern = r'<meta[^>]*charset[^>]*>'
-        has_charset = re.search(meta_pattern, content, re.IGNORECASE)
-        if not has_charset:
-            # 如果没有charset meta标签，至少应该有其他meta标签
-            has_meta = '<meta' in content.lower()
-            assert has_meta or len(content) < 200, "HTML文件建议包含字符集声明"
+        assert len(found_keywords) > 0, f"开发文档中未找到项目相关关键词，期望包含: {project_keywords}"
