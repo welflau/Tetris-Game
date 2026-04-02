@@ -42,6 +42,8 @@
             font-weight: normal;
             line-height: 1;
             text-rendering: optimizeSpeed;
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
 
         /* 雪花颜色变体 */
@@ -72,517 +74,605 @@
 
         /* 雪花大小变体 */
         .snowflake.size-small {
-            font-size: 0.6em;
-            transform-origin: center;
+            font-size: 0.8em;
         }
 
         .snowflake.size-medium {
-            font-size: 1.0em;
-            transform-origin: center;
+            font-size: 1.2em;
         }
 
         .snowflake.size-large {
-            font-size: 1.4em;
-            transform-origin: center;
+            font-size: 1.6em;
         }
 
-        .snowflake.size-xlarge {
-            font-size: 1.8em;
-            transform-origin: center;
-        }
-
-        /* 雪花透明度变体 */
-        .snowflake.opacity-light {
-            opacity: 0.4;
-        }
-
-        .snowflake.opacity-medium {
-            opacity: 0.7;
-        }
-
-        .snowflake.opacity-heavy {
-            opacity: 0.9;
-        }
-
-        .snowflake.opacity-full {
-            opacity: 1.0;
-        }
-
-        /* 控制面板样式 - 确保在雪花之上 */
-        .control-panel {
+        /* 性能监控面板 */
+        #performance-panel {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            padding: 20px;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
             color: white;
-            font-size: 14px;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
             z-index: 1000;
-            pointer-events: auto;
-            min-width: 250px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            min-width: 200px;
         }
 
-        .control-panel h3 {
-            margin-bottom: 15px;
-            text-align: center;
-            font-size: 16px;
-            color: #ffffff;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        .performance-metric {
+            margin: 2px 0;
+        }
+
+        .performance-status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .status-good {
+            background-color: #4CAF50;
+        }
+
+        .status-warning {
+            background-color: #FF9800;
+        }
+
+        .status-critical {
+            background-color: #F44336;
+        }
+
+        /* 控制面板 */
+        #control-panel {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1000;
         }
 
         .control-group {
-            margin-bottom: 15px;
+            margin: 5px 0;
         }
 
         .control-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #e6f3ff;
-        }
-
-        .control-group input[type="range"] {
-            width: 100%;
-            margin-bottom: 5px;
-            accent-color: #99ccff;
-        }
-
-        .control-group input[type="checkbox"] {
-            margin-right: 8px;
-            accent-color: #99ccff;
-        }
-
-        .control-group .value-display {
+            display: inline-block;
+            width: 120px;
             font-size: 12px;
-            color: #cce7ff;
-            text-align: right;
         }
 
-        .control-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .control-buttons button {
-            flex: 1;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
-
-        .control-buttons button:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-1px);
-        }
-
-        .control-buttons button:active {
-            transform: translateY(0);
-        }
-
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .control-panel {
-                top: 10px;
-                right: 10px;
-                left: 10px;
-                padding: 15px;
-                min-width: auto;
-                font-size: 12px;
-            }
-
-            .control-panel h3 {
-                font-size: 14px;
-                margin-bottom: 10px;
-            }
-
-            .control-group {
-                margin-bottom: 10px;
-            }
-
-            .snowflake {
-                font-size: 0.8em;
-            }
-
-            .snowflake.size-small {
-                font-size: 0.5em;
-            }
-
-            .snowflake.size-medium {
-                font-size: 0.8em;
-            }
-
-            .snowflake.size-large {
-                font-size: 1.1em;
-            }
-
-            .snowflake.size-xlarge {
-                font-size: 1.4em;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .control-panel {
-                padding: 10px;
-                font-size: 11px;
-            }
-
-            .control-buttons {
-                flex-direction: column;
-                gap: 5px;
-            }
-
-            .snowflake {
-                font-size: 0.7em;
-            }
-        }
-
-        /* 高性能优化 */
-        @media (prefers-reduced-motion: reduce) {
-            .snowflake {
-                animation: none !important;
-                transform: none !important;
-            }
-        }
-
-        /* 暗色主题适配 */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background: linear-gradient(135deg, #0f1419, #1a2332);
-            }
-        }
-
-        /* 高对比度模式适配 */
-        @media (prefers-contrast: high) {
-            .snowflake {
-                text-shadow: 0 0 2px #000000, 0 0 4px #000000;
-            }
-
-            .control-panel {
-                background: rgba(0, 0, 0, 0.8);
-                border: 2px solid #ffffff;
-            }
-        }
-
-        /* 打印样式 */
-        @media print {
-            #snowflake-container,
-            .control-panel {
-                display: none;
-            }
+        .control-group input, .control-group select {
+            width: 80px;
+            padding: 2px;
         }
     </style>
 </head>
 <body>
-    <!-- 雪花容器 -->
     <div id="snowflake-container"></div>
+    
+    <!-- 性能监控面板 -->
+    <div id="performance-panel">
+        <div class="performance-metric">
+            <span class="performance-status status-good" id="fps-status"></span>
+            FPS: <span id="fps-value">60</span>
+        </div>
+        <div class="performance-metric">
+            <span class="performance-status status-good" id="memory-status"></span>
+            Memory: <span id="memory-value">0</span>MB
+        </div>
+        <div class="performance-metric">
+            <span class="performance-status status-good" id="snowflakes-status"></span>
+            Snowflakes: <span id="snowflakes-count">0</span>
+        </div>
+        <div class="performance-metric">
+            Quality: <span id="quality-level">High</span>
+        </div>
+        <div class="performance-metric">
+            Pool: <span id="pool-status">0/0</span>
+        </div>
+    </div>
 
     <!-- 控制面板 -->
-    <div class="control-panel">
-        <h3>❄️ 雪花控制台</h3>
-        
+    <div id="control-panel">
         <div class="control-group">
-            <label for="snowflake-count">雪花数量</label>
-            <input type="range" id="snowflake-count" min="10" max="200" value="50">
-            <div class="value-display" id="count-value">50</div>
+            <label>Max Snowflakes:</label>
+            <input type="range" id="max-snowflakes" min="10" max="500" value="100">
+            <span id="max-snowflakes-value">100</span>
         </div>
-
         <div class="control-group">
-            <label for="fall-speed">下落速度</label>
-            <input type="range" id="fall-speed" min="0.5" max="3" step="0.1" value="1">
-            <div class="value-display" id="speed-value">1.0</div>
+            <label>Quality:</label>
+            <select id="quality-select">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high" selected>High</option>
+            </select>
         </div>
-
         <div class="control-group">
-            <label for="wind-strength">风力强度</label>
-            <input type="range" id="wind-strength" min="0" max="2" step="0.1" value="0.5">
-            <div class="value-display" id="wind-value">0.5</div>
+            <label>Adaptive Mode:</label>
+            <input type="checkbox" id="adaptive-mode" checked>
         </div>
-
         <div class="control-group">
-            <label>
-                <input type="checkbox" id="enable-rotation" checked>
-                启用旋转效果
-            </label>
-        </div>
-
-        <div class="control-group">
-            <label>
-                <input type="checkbox" id="enable-glow" checked>
-                启用发光效果
-            </label>
-        </div>
-
-        <div class="control-buttons">
-            <button onclick="pauseSnowfall()">暂停</button>
-            <button onclick="resumeSnowfall()">继续</button>
-            <button onclick="resetSnowfall()">重置</button>
+            <label>GPU Acceleration:</label>
+            <input type="checkbox" id="gpu-acceleration" checked>
         </div>
     </div>
 
     <script>
-        class SnowflakeGenerator {
+        // 性能监控器
+        class PerformanceMonitor {
             constructor() {
-                this.container = document.getElementById('snowflake-container');
-                this.snowflakes = [];
-                this.isRunning = true;
-                this.config = {
-                    count: 50,
-                    fallSpeed: 1,
-                    windStrength: 0.5,
-                    enableRotation: true,
-                    enableGlow: true
+                this.isMonitoring = false;
+                this.fps = 60;
+                this.frameCount = 0;
+                this.lastTime = performance.now();
+                this.memoryUsage = 0;
+                this.callbacks = [];
+                this.metrics = {
+                    fps: 60,
+                    memory: 0,
+                    renderTime: 0,
+                    snowflakeCount: 0
                 };
-                this.snowflakeSymbols = ['❄', '❅', '❆', '✻', '✼', '❈', '❉', '❊'];
-                this.init();
             }
 
-            init() {
-                this.setupControls();
-                this.createSnowflakes();
-                this.animate();
+            startMonitoring() {
+                this.isMonitoring = true;
+                this.monitorLoop();
             }
 
-            setupControls() {
-                const countSlider = document.getElementById('snowflake-count');
-                const speedSlider = document.getElementById('fall-speed');
-                const windSlider = document.getElementById('wind-strength');
-                const rotationCheckbox = document.getElementById('enable-rotation');
-                const glowCheckbox = document.getElementById('enable-glow');
+            stopMonitoring() {
+                this.isMonitoring = false;
+            }
 
-                countSlider.addEventListener('input', (e) => {
-                    this.config.count = parseInt(e.target.value);
-                    document.getElementById('count-value').textContent = e.target.value;
-                    this.updateSnowflakeCount();
-                });
+            monitorLoop() {
+                if (!this.isMonitoring) return;
 
-                speedSlider.addEventListener('input', (e) => {
-                    this.config.fallSpeed = parseFloat(e.target.value);
-                    document.getElementById('speed-value').textContent = e.target.value;
-                });
+                const now = performance.now();
+                this.frameCount++;
 
-                windSlider.addEventListener('input', (e) => {
-                    this.config.windStrength = parseFloat(e.target.value);
-                    document.getElementById('wind-value').textContent = e.target.value;
-                });
+                // 计算FPS
+                if (now - this.lastTime >= 1000) {
+                    this.fps = Math.round((this.frameCount * 1000) / (now - this.lastTime));
+                    this.metrics.fps = this.fps;
+                    this.frameCount = 0;
+                    this.lastTime = now;
 
-                rotationCheckbox.addEventListener('change', (e) => {
-                    this.config.enableRotation = e.target.checked;
-                });
+                    // 更新内存使用情况
+                    if (performance.memory) {
+                        this.memoryUsage = Math.round(performance.memory.usedJSHeapSize / 1024 / 1024);
+                        this.metrics.memory = this.memoryUsage;
+                    }
 
-                glowCheckbox.addEventListener('change', (e) => {
-                    this.config.enableGlow = e.target.checked;
-                    this.updateGlowEffect();
+                    this.updateUI();
+                    this.checkThresholds();
+                }
+
+                requestAnimationFrame(() => this.monitorLoop());
+            }
+
+            updateUI() {
+                document.getElementById('fps-value').textContent = this.fps;
+                document.getElementById('memory-value').textContent = this.memoryUsage;
+                
+                // 更新状态指示器
+                const fpsStatus = document.getElementById('fps-status');
+                fpsStatus.className = 'performance-status ' + 
+                    (this.fps >= 50 ? 'status-good' : this.fps >= 30 ? 'status-warning' : 'status-critical');
+
+                const memoryStatus = document.getElementById('memory-status');
+                memoryStatus.className = 'performance-status ' + 
+                    (this.memoryUsage <= 50 ? 'status-good' : this.memoryUsage <= 100 ? 'status-warning' : 'status-critical');
+            }
+
+            checkThresholds() {
+                let performanceLevel = 'high';
+                if (this.fps < 30 || this.memoryUsage > 100) {
+                    performanceLevel = 'low';
+                } else if (this.fps < 50 || this.memoryUsage > 50) {
+                    performanceLevel = 'medium';
+                }
+
+                this.callbacks.forEach(callback => callback(performanceLevel));
+            }
+
+            getPerformanceMetrics() {
+                return { ...this.metrics };
+            }
+
+            onPerformanceThreshold(callback) {
+                this.callbacks.push(callback);
+            }
+        }
+
+        // 自适应质量控制器
+        class AdaptiveQualityController {
+            constructor() {
+                this.currentQuality = 'high';
+                this.maxSnowflakes = 100;
+                this.adaptiveMode = true;
+                this.qualitySettings = {
+                    low: { maxSnowflakes: 30, animationQuality: 0.5, updateFrequency: 30 },
+                    medium: { maxSnowflakes: 60, animationQuality: 0.7, updateFrequency: 45 },
+                    high: { maxSnowflakes: 100, animationQuality: 1.0, updateFrequency: 60 }
+                };
+            }
+
+            adjustQuality(performanceLevel) {
+                if (!this.adaptiveMode) return;
+
+                const newQuality = performanceLevel;
+                if (newQuality !== this.currentQuality) {
+                    this.currentQuality = newQuality;
+                    const settings = this.qualitySettings[newQuality];
+                    
+                    this.setSnowflakeCount(settings.maxSnowflakes);
+                    this.setAnimationQuality(settings.animationQuality);
+                    
+                    document.getElementById('quality-level').textContent = 
+                        newQuality.charAt(0).toUpperCase() + newQuality.slice(1);
+                }
+            }
+
+            setSnowflakeCount(count) {
+                this.maxSnowflakes = count;
+                if (window.snowflakeSystem) {
+                    window.snowflakeSystem.adjustSnowflakeCount(count);
+                }
+            }
+
+            setAnimationQuality(level) {
+                // 调整动画质量
+                const container = document.getElementById('snowflake-container');
+                if (level < 0.7) {
+                    container.style.filter = 'blur(0.5px)';
+                } else {
+                    container.style.filter = 'none';
+                }
+            }
+
+            enableAdaptiveMode() {
+                this.adaptiveMode = true;
+            }
+
+            disableAdaptiveMode() {
+                this.adaptiveMode = false;
+            }
+        }
+
+        // 渲染优化器
+        class RenderOptimizer {
+            constructor() {
+                this.viewportCulling = true;
+                this.gpuAcceleration = true;
+                this.batchSize = 10;
+                this.viewportBounds = {
+                    left: -100,
+                    right: window.innerWidth + 100,
+                    top: -100,
+                    bottom: window.innerHeight + 100
+                };
+            }
+
+            batchUpdate(snowflakes) {
+                // 批量更新雪花位置
+                const batches = [];
+                for (let i = 0; i < snowflakes.length; i += this.batchSize) {
+                    batches.push(snowflakes.slice(i, i + this.batchSize));
+                }
+
+                batches.forEach((batch, index) => {
+                    setTimeout(() => {
+                        batch.forEach(snowflake => {
+                            if (this.isInViewport(snowflake)) {
+                                this.updateSnowflakeTransform(snowflake);
+                            }
+                        });
+                    }, index * 2);
                 });
             }
 
-            createSnowflake() {
-                const snowflake = {
-                    element: document.createElement('div'),
-                    x: Math.random() * window.innerWidth,
-                    y: -20,
-                    vx: (Math.random() - 0.5) * 2,
-                    vy: Math.random() * 2 + 1,
+            isInViewport(snowflake) {
+                if (!this.viewportCulling) return true;
+                
+                const x = snowflake.x;
+                const y = snowflake.y;
+                
+                return x >= this.viewportBounds.left && 
+                       x <= this.viewportBounds.right && 
+                       y >= this.viewportBounds.top && 
+                       y <= this.viewportBounds.bottom;
+            }
+
+            updateSnowflakeTransform(snowflake) {
+                if (this.gpuAcceleration) {
+                    snowflake.element.style.transform = 
+                        `translate3d(${snowflake.x}px, ${snowflake.y}px, 0) rotate(${snowflake.rotation}deg)`;
+                } else {
+                    snowflake.element.style.left = snowflake.x + 'px';
+                    snowflake.element.style.top = snowflake.y + 'px';
+                    snowflake.element.style.transform = `rotate(${snowflake.rotation}deg)`;
+                }
+            }
+
+            enableViewportCulling() {
+                this.viewportCulling = true;
+            }
+
+            optimizeTransforms() {
+                // 优化变换性能
+                const snowflakes = document.querySelectorAll('.snowflake');
+                snowflakes.forEach(element => {
+                    element.style.willChange = 'transform';
+                    element.style.transform = element.style.transform || 'translateZ(0)';
+                });
+            }
+
+            enableGPUAcceleration() {
+                this.gpuAcceleration = true;
+            }
+
+            disableGPUAcceleration() {
+                this.gpuAcceleration = false;
+            }
+        }
+
+        // 内存管理器
+        class MemoryManager {
+            constructor(initialSize = 50) {
+                this.pool = [];
+                this.activeSnowflakes = new Set();
+                this.maxPoolSize = initialSize * 2;
+                this.initializePool(initialSize);
+            }
+
+            initializePool(size) {
+                for (let i = 0; i < size; i++) {
+                    this.pool.push(this.createSnowflakeObject());
+                }
+            }
+
+            createSnowflakeObject() {
+                const element = document.createElement('div');
+                element.className = 'snowflake';
+                element.innerHTML = '❄';
+                
+                return {
+                    element: element,
+                    x: 0,
+                    y: 0,
+                    speed: 1,
                     rotation: 0,
-                    rotationSpeed: (Math.random() - 0.5) * 4,
-                    symbol: this.snowflakeSymbols[Math.floor(Math.random() * this.snowflakeSymbols.length)]
+                    rotationSpeed: 1,
+                    size: 1,
+                    opacity: 1,
+                    isActive: false
                 };
+            }
 
-                snowflake.element.className = 'snowflake';
-                snowflake.element.textContent = snowflake.symbol;
+            getSnowflake() {
+                let snowflake;
                 
-                // 随机应用样式变体
-                const typeClass = `type-${Math.floor(Math.random() * 5) + 1}`;
-                const sizeClass = this.getRandomSizeClass();
-                const opacityClass = this.getRandomOpacityClass();
+                if (this.pool.length > 0) {
+                    snowflake = this.pool.pop();
+                } else {
+                    snowflake = this.createSnowflakeObject();
+                }
                 
-                snowflake.element.classList.add(typeClass, sizeClass, opacityClass);
+                snowflake.isActive = true;
+                this.activeSnowflakes.add(snowflake);
+                this.resetSnowflake(snowflake);
                 
-                this.container.appendChild(snowflake.element);
                 return snowflake;
             }
 
-            getRandomSizeClass() {
-                const sizes = ['size-small', 'size-medium', 'size-large', 'size-xlarge'];
-                const weights = [0.3, 0.4, 0.2, 0.1]; // 小雪花更多
-                const random = Math.random();
-                let sum = 0;
+            releaseSnowflake(snowflake) {
+                if (!snowflake.isActive) return;
                 
-                for (let i = 0; i < weights.length; i++) {
-                    sum += weights[i];
-                    if (random <= sum) {
-                        return sizes[i];
-                    }
-                }
-                return sizes[1]; // 默认中等大小
-            }
-
-            getRandomOpacityClass() {
-                const opacities = ['opacity-light', 'opacity-medium', 'opacity-heavy', 'opacity-full'];
-                const weights = [0.2, 0.3, 0.3, 0.2];
-                const random = Math.random();
-                let sum = 0;
+                snowflake.isActive = false;
+                this.activeSnowflakes.delete(snowflake);
                 
-                for (let i = 0; i < weights.length; i++) {
-                    sum += weights[i];
-                    if (random <= sum) {
-                        return opacities[i];
-                    }
+                // 从DOM中移除
+                if (snowflake.element.parentNode) {
+                    snowflake.element.parentNode.removeChild(snowflake.element);
                 }
-                return opacities[1]; // 默认中等透明度
-            }
-
-            createSnowflakes() {
-                this.clearSnowflakes();
-                for (let i = 0; i < this.config.count; i++) {
-                    this.snowflakes.push(this.createSnowflake());
+                
+                // 返回到对象池
+                if (this.pool.length < this.maxPoolSize) {
+                    this.pool.push(snowflake);
                 }
             }
 
-            updateSnowflakeCount() {
-                const currentCount = this.snowflakes.length;
-                const targetCount = this.config.count;
+            resetSnowflake(snowflake) {
+                // 随机初始化雪花属性
+                snowflake.x = Math.random() * window.innerWidth;
+                snowflake.y = -20;
+                snowflake.speed = Math.random() * 2 + 1;
+                snowflake.rotation = 0;
+                snowflake.rotationSpeed = (Math.random() - 0.5) * 4;
+                snowflake.size = Math.random() * 0.8 + 0.6;
+                snowflake.opacity = Math.random() * 0.6 + 0.4;
+                
+                // 设置样式
+                const types = ['type-1', 'type-2', 'type-3', 'type-4', 'type-5'];
+                const sizes = ['size-small', 'size-medium', 'size-large'];
+                
+                snowflake.element.className = 'snowflake ' + 
+                    types[Math.floor(Math.random() * types.length)] + ' ' +
+                    sizes[Math.floor(Math.random() * sizes.length)];
+                
+                snowflake.element.style.opacity = snowflake.opacity;
+                snowflake.element.style.fontSize = snowflake.size + 'em';
+            }
 
-                if (currentCount < targetCount) {
-                    // 添加雪花
-                    for (let i = currentCount; i < targetCount; i++) {
-                        this.snowflakes.push(this.createSnowflake());
-                    }
-                } else if (currentCount > targetCount) {
-                    // 移除雪花
-                    const toRemove = this.snowflakes.splice(targetCount);
-                    toRemove.forEach(snowflake => {
-                        if (snowflake.element.parentNode) {
-                            snowflake.element.parentNode.removeChild(snowflake.element);
-                        }
-                    });
+            cleanupPool() {
+                // 清理未使用的对象
+                while (this.pool.length > 20) {
+                    this.pool.pop();
                 }
             }
 
-            updateGlowEffect() {
-                this.snowflakes.forEach(snowflake => {
-                    if (this.config.enableGlow) {
-                        snowflake.element.style.filter = 'none';
+            getPoolStatus() {
+                return {
+                    poolSize: this.pool.length,
+                    activeCount: this.activeSnowflakes.size,
+                    totalAllocated: this.pool.length + this.activeSnowflakes.size
+                };
+            }
+        }
+
+        // 雪花系统主类
+        class SnowflakeSystem {
+            constructor() {
+                this.container = document.getElementById('snowflake-container');
+                this.snowflakes = [];
+                this.maxSnowflakes = 100;
+                this.isRunning = false;
+                
+                // 初始化各个组件
+                this.performanceMonitor = new PerformanceMonitor();
+                this.qualityController = new AdaptiveQualityController();
+                this.renderOptimizer = new RenderOptimizer();
+                this.memoryManager = new MemoryManager();
+                
+                this.setupEventListeners();
+                this.setupPerformanceCallback();
+            }
+
+            setupEventListeners() {
+                // 控制面板事件
+                document.getElementById('max-snowflakes').addEventListener('input', (e) => {
+                    this.maxSnowflakes = parseInt(e.target.value);
+                    document.getElementById('max-snowflakes-value').textContent = this.maxSnowflakes;
+                    this.adjustSnowflakeCount(this.maxSnowflakes);
+                });
+
+                document.getElementById('quality-select').addEventListener('change', (e) => {
+                    this.qualityController.currentQuality = e.target.value;
+                    this.qualityController.adjustQuality(e.target.value);
+                });
+
+                document.getElementById('adaptive-mode').addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        this.qualityController.enableAdaptiveMode();
                     } else {
-                        snowflake.element.style.filter = 'drop-shadow(0 0 0 transparent)';
+                        this.qualityController.disableAdaptiveMode();
                     }
+                });
+
+                document.getElementById('gpu-acceleration').addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        this.renderOptimizer.enableGPUAcceleration();
+                    } else {
+                        this.renderOptimizer.disableGPUAcceleration();
+                    }
+                });
+
+                // 窗口大小变化
+                window.addEventListener('resize', () => {
+                    this.renderOptimizer.viewportBounds = {
+                        left: -100,
+                        right: window.innerWidth + 100,
+                        top: -100,
+                        bottom: window.innerHeight + 100
+                    };
                 });
             }
 
-            updateSnowflake(snowflake) {
+            setupPerformanceCallback() {
+                this.performanceMonitor.onPerformanceThreshold((level) => {
+                    this.qualityController.adjustQuality(level);
+                });
+            }
+
+            start() {
+                this.isRunning = true;
+                this.performanceMonitor.startMonitoring();
+                this.animate();
+                this.spawnSnowflakes();
+            }
+
+            stop() {
+                this.isRunning = false;
+                this.performanceMonitor.stopMonitoring();
+            }
+
+            spawnSnowflakes() {
                 if (!this.isRunning) return;
 
-                // 更新位置
-                snowflake.y += snowflake.vy * this.config.fallSpeed;
-                snowflake.x += snowflake.vx + (Math.sin(snowflake.y * 0.01) * this.config.windStrength);
-
-                // 更新旋转
-                if (this.config.enableRotation) {
-                    snowflake.rotation += snowflake.rotationSpeed;
+                if (this.snowflakes.length < this.maxSnowflakes) {
+                    const snowflake = this.memoryManager.getSnowflake();
+                    this.container.appendChild(snowflake.element);
+                    this.snowflakes.push(snowflake);
                 }
 
-                // 边界检查
-                if (snowflake.y > window.innerHeight + 20) {
-                    snowflake.y = -20;
-                    snowflake.x = Math.random() * window.innerWidth;
-                }
-
-                if (snowflake.x > window.innerWidth + 20) {
-                    snowflake.x = -20;
-                } else if (snowflake.x < -20) {
-                    snowflake.x = window.innerWidth + 20;
-                }
-
-                // 应用变换
-                const transform = `translate(${snowflake.x}px, ${snowflake.y}px) ${this.config.enableRotation ? `rotate(${snowflake.rotation}deg)` : ''}`;
-                snowflake.element.style.transform = transform;
+                setTimeout(() => this.spawnSnowflakes(), 200);
             }
 
             animate() {
-                this.snowflakes.forEach(snowflake => this.updateSnowflake(snowflake));
+                if (!this.isRunning) return;
+
+                // 更新雪花位置
+                this.snowflakes = this.snowflakes.filter(snowflake => {
+                    snowflake.y += snowflake.speed;
+                    snowflake.x += Math.sin(snowflake.y * 0.01) * 0.5;
+                    snowflake.rotation += snowflake.rotationSpeed;
+
+                    // 检查是否超出屏幕
+                    if (snowflake.y > window.innerHeight + 50) {
+                        this.memoryManager.releaseSnowflake(snowflake);
+                        return false;
+                    }
+
+                    return true;
+                });
+
+                // 批量更新渲染
+                this.renderOptimizer.batchUpdate(this.snowflakes);
+
+                // 更新UI
+                this.updateUI();
+
                 requestAnimationFrame(() => this.animate());
             }
 
-            pause() {
-                this.isRunning = false;
+            updateUI() {
+                document.getElementById('snowflakes-count').textContent = this.snowflakes.length;
+                
+                const poolStatus = this.memoryManager.getPoolStatus();
+                document.getElementById('pool-status').textContent = 
+                    `${poolStatus.activeCount}/${poolStatus.totalAllocated}`;
+
+                const snowflakesStatus = document.getElementById('snowflakes-status');
+                snowflakesStatus.className = 'performance-status ' + 
+                    (this.snowflakes.length <= this.maxSnowflakes * 0.8 ? 'status-good' : 
+                     this.snowflakes.length <= this.maxSnowflakes ? 'status-warning' : 'status-critical');
             }
 
-            resume() {
-                this.isRunning = true;
-            }
-
-            reset() {
-                this.clearSnowflakes();
-                this.createSnowflakes();
-                this.isRunning = true;
-            }
-
-            clearSnowflakes() {
-                this.snowflakes.forEach(snowflake => {
-                    if (snowflake.element.parentNode) {
-                        snowflake.element.parentNode.removeChild(snowflake.element);
-                    }
-                });
-                this.snowflakes = [];
-            }
-        }
-
-        // 全局控制函数
-        let snowGenerator;
-
-        function pauseSnowfall() {
-            if (snowGenerator) {
-                snowGenerator.pause();
-            }
-        }
-
-        function resumeSnowfall() {
-            if (snowGenerator) {
-                snowGenerator.resume();
-            }
-        }
-
-        function resetSnowfall() {
-            if (snowGenerator) {
-                snowGenerator.reset();
-            }
-        }
-
-        // 窗口大小变化处理
-        window.addEventListener('resize', () => {
-            if (snowGenerator) {
-                // 重新调整雪花位置以适应新的窗口大小
-                snowGenerator.snowflakes.forEach(snowflake => {
-                    if (snowflake.x > window.innerWidth) {
-                        snowflake.x = window.innerWidth;
-                    }
-                });
-            }
-        });
-
-        // 页面加载完成后初始化
-        document.addEventListener('DOMContentLoaded', () => {
-            snowGenerator = new SnowflakeGenerator();
-        });
-
-        // 页面可见性变化处理（优化性能）
-        document.addEventListener('visibilitychange', () => {
-            if (snowGenerator) {
-                if (document.hidden) {
-                    snowGenerator.pause();
-                } else {
-                    snowGenerator.resume();
+            adjustSnowflakeCount(count) {
+                this.maxSnowflakes = count;
+                
+                // 如果当前雪花数量超过限制，移除多余的
+                while (this.snowflakes.length > count) {
+                    const snowflake = this.snowflakes.pop();
+                    this.memoryManager.releaseSnowflake(snowflake);
                 }
+            }
+        }
+
+        // 初始化系统
+        window.addEventListener('DOMContentLoaded', () => {
+            window.snowflakeSystem = new SnowflakeSystem();
+            window.snowflakeSystem.start();
+        });
+
+        // 页面卸载时清理资源
+        window.addEventListener('beforeunload', () => {
+            if (window.snowflakeSystem) {
+                window.snowflakeSystem.stop();
             }
         });
     </script>
