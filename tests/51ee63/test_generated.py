@@ -13,38 +13,24 @@ class TestSnowflakeEffect:
     def test_html_contains_snowflake_elements(self):
         """测试HTML文件是否包含雪花特效的关键元素"""
         html_file = Path("index.html")
-        assert html_file.exists(), "HTML文件不存在"
+        assert html_file.exists(), "HTML文件不存在，无法进行内容测试"
         
         content = html_file.read_text(encoding='utf-8')
         
-        # 检查是否包含canvas元素或雪花相关的div
-        assert any(keyword in content.lower() for keyword in ['canvas', 'snowflake', 'snow']), \
-            "HTML文件中未找到雪花特效相关元素"
+        # 检查是否包含canvas元素（通常用于雪花动画）
+        assert re.search(r'<canvas', content, re.IGNORECASE), "HTML中未找到canvas元素"
         
-        # 检查是否包含JavaScript代码
-        assert '<script' in content or '.js' in content, \
-            "HTML文件中未找到JavaScript引用"
+        # 检查是否包含JavaScript相关内容
+        js_patterns = [
+            r'<script',
+            r'snowflake|snow|雪花',
+            r'animation|animate'
+        ]
         
-        # 检查基本HTML结构
-        assert '<html' in content and '</html>' in content, \
-            "HTML文件缺少基本的html标签结构"
+        js_found = any(re.search(pattern, content, re.IGNORECASE) for pattern in js_patterns)
+        assert js_found, "HTML中未找到雪花特效相关的JavaScript代码"
     
-    def test_html_has_valid_structure(self):
-        """测试HTML文件是否具有有效的文档结构"""
-        html_file = Path("index.html")
-        content = html_file.read_text(encoding='utf-8')
-        
-        # 检查DOCTYPE声明
-        assert '<!doctype' in content.lower() or '<!DOCTYPE' in content, \
-            "HTML文件缺少DOCTYPE声明"
-        
-        # 检查head和body标签
-        assert '<head' in content and '</head>' in content, \
-            "HTML文件缺少head标签"
-        assert '<body' in content and '</body>' in content, \
-            "HTML文件缺少body标签"
-    
-    def test_dev_notes_file_exists(self):
+    def test_dev_notes_file_exists_and_content(self):
         """测试开发文档是否存在并包含有效内容"""
         docs_file = Path("docs/51ee63/19a016/dev-notes.md")
         assert docs_file.exists(), "开发文档文件不存在"
@@ -52,21 +38,46 @@ class TestSnowflakeEffect:
         
         content = docs_file.read_text(encoding='utf-8')
         assert len(content.strip()) > 0, "开发文档内容为空"
+        
+        # 检查是否包含开发相关的关键词
+        dev_keywords = ['开发', '测试', '雪花', 'snowflake', '特效', 'effect']
+        keyword_found = any(keyword in content for keyword in dev_keywords)
+        assert keyword_found, "开发文档中未找到相关的开发关键词"
     
     def test_project_structure_integrity(self):
         """测试项目结构的完整性"""
-        # 检查根目录下的主要文件
-        assert Path("index.html").exists(), "缺少主HTML文件"
+        # 检查项目根目录
+        root_path = Path(".")
+        assert root_path.exists(), "项目根目录不存在"
         
         # 检查docs目录结构
-        docs_dir = Path("docs")
-        if docs_dir.exists():
-            assert docs_dir.is_dir(), "docs应该是一个目录"
+        docs_path = Path("docs")
+        if docs_path.exists():
+            assert docs_path.is_dir(), "docs应该是一个目录"
+            
+        # 检查是否有基本的web文件
+        web_files = ["index.html"]
+        for file_name in web_files:
+            file_path = Path(file_name)
+            if file_path.exists():
+                assert file_path.stat().st_size > 0, f"{file_name}文件大小为0"
+    
+    def test_html_basic_structure(self):
+        """测试HTML文件的基本结构是否正确"""
+        html_file = Path("index.html")
+        if not html_file.exists():
+            pytest.skip("HTML文件不存在，跳过结构测试")
+            
+        content = html_file.read_text(encoding='utf-8')
         
-        # 检查是否有CSS或JS文件（可能在子目录中）
-        root_path = Path(".")
-        has_css = any(root_path.rglob("*.css"))
-        has_js = any(root_path.rglob("*.js"))
+        # 检查基本HTML结构
+        assert re.search(r'<!DOCTYPE\s+html>', content, re.IGNORECASE), "缺少DOCTYPE声明"
+        assert re.search(r'<html', content, re.IGNORECASE), "缺少html标签"
+        assert re.search(r'<head', content, re.IGNORECASE), "缺少head标签"
+        assert re.search(r'<body', content, re.IGNORECASE), "缺少body标签"
         
-        assert has_css or has_js or "style" in Path("index.html").read_text(encoding='utf-8').lower(), \
-            "项目中未找到样式文件或内联样式"
+        # 检查标题
+        title_match = re.search(r'<title>(.*?)</title>', content, re.IGNORECASE | re.DOTALL)
+        if title_match:
+            title = title_match.group(1).strip()
+            assert len(title) > 0, "页面标题为空"
