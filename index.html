@@ -16,8 +16,22 @@
             overflow: hidden;
             font-family: 'Arial', sans-serif;
             height: 100vh;
+            position: relative;
         }
 
+        /* 雪花容器 - 确保正确的层级关系 */
+        #snowflake-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        /* 雪花基础样式 */
         .snowflake {
             position: absolute;
             color: white;
@@ -25,406 +39,551 @@
             pointer-events: none;
             font-size: 1em;
             will-change: transform;
+            font-weight: normal;
+            line-height: 1;
+            text-rendering: optimizeSpeed;
         }
 
-        /* 雪花样式变体 */
+        /* 雪花颜色变体 */
         .snowflake.type-1 {
             color: #ffffff;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8), 0 0 10px rgba(255, 255, 255, 0.4);
         }
 
         .snowflake.type-2 {
             color: #e6f3ff;
-            text-shadow: 0 0 3px rgba(230, 243, 255, 0.6);
+            text-shadow: 0 0 3px rgba(230, 243, 255, 0.6), 0 0 8px rgba(230, 243, 255, 0.3);
         }
 
         .snowflake.type-3 {
             color: #cce7ff;
-            text-shadow: 0 0 4px rgba(204, 231, 255, 0.7);
+            text-shadow: 0 0 4px rgba(204, 231, 255, 0.7), 0 0 12px rgba(204, 231, 255, 0.4);
         }
 
         .snowflake.type-4 {
             color: #b3daff;
-            text-shadow: 0 0 6px rgba(179, 218, 255, 0.9);
+            text-shadow: 0 0 6px rgba(179, 218, 255, 0.9), 0 0 15px rgba(179, 218, 255, 0.5);
         }
 
         .snowflake.type-5 {
             color: #99ccff;
-            text-shadow: 0 0 2px rgba(153, 204, 255, 0.5);
+            text-shadow: 0 0 2px rgba(153, 204, 255, 0.5), 0 0 6px rgba(153, 204, 255, 0.2);
         }
 
         /* 雪花大小变体 */
         .snowflake.size-small {
-            font-size: 0.8em;
+            font-size: 0.6em;
+            transform-origin: center;
         }
 
         .snowflake.size-medium {
-            font-size: 1.2em;
+            font-size: 1.0em;
+            transform-origin: center;
         }
 
         .snowflake.size-large {
-            font-size: 1.6em;
+            font-size: 1.4em;
+            transform-origin: center;
         }
 
         .snowflake.size-xlarge {
-            font-size: 2.0em;
+            font-size: 1.8em;
+            transform-origin: center;
         }
 
         /* 雪花透明度变体 */
         .snowflake.opacity-light {
-            opacity: 0.6;
+            opacity: 0.4;
         }
 
         .snowflake.opacity-medium {
-            opacity: 0.8;
+            opacity: 0.7;
         }
 
         .snowflake.opacity-heavy {
+            opacity: 0.9;
+        }
+
+        .snowflake.opacity-full {
             opacity: 1.0;
         }
 
-        /* 控制面板样式 */
+        /* 控制面板样式 - 确保在雪花之上 */
         .control-panel {
             position: fixed;
             top: 20px;
             right: 20px;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
             padding: 20px;
             color: white;
+            font-size: 14px;
             z-index: 1000;
+            pointer-events: auto;
+            min-width: 250px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
-        .control-panel button {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 8px 16px;
-            margin: 5px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .control-panel h3 {
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 16px;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        .control-panel button:hover {
-            background: rgba(255, 255, 255, 0.3);
+        .control-group {
+            margin-bottom: 15px;
         }
 
-        .control-panel input[type="range"] {
-            width: 100%;
-            margin: 10px 0;
-        }
-
-        .control-panel label {
+        .control-group label {
             display: block;
             margin-bottom: 5px;
-            font-size: 14px;
+            font-weight: bold;
+            color: #e6f3ff;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            margin-bottom: 5px;
+            accent-color: #99ccff;
+        }
+
+        .control-group input[type="checkbox"] {
+            margin-right: 8px;
+            accent-color: #99ccff;
+        }
+
+        .control-group .value-display {
+            font-size: 12px;
+            color: #cce7ff;
+            text-align: right;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .control-buttons button {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .control-buttons button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .control-buttons button:active {
+            transform: translateY(0);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .control-panel {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                padding: 15px;
+                min-width: auto;
+                font-size: 12px;
+            }
+
+            .control-panel h3 {
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+
+            .control-group {
+                margin-bottom: 10px;
+            }
+
+            .snowflake {
+                font-size: 0.8em;
+            }
+
+            .snowflake.size-small {
+                font-size: 0.5em;
+            }
+
+            .snowflake.size-medium {
+                font-size: 0.8em;
+            }
+
+            .snowflake.size-large {
+                font-size: 1.1em;
+            }
+
+            .snowflake.size-xlarge {
+                font-size: 1.4em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .control-panel {
+                padding: 10px;
+                font-size: 11px;
+            }
+
+            .control-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .snowflake {
+                font-size: 0.7em;
+            }
+        }
+
+        /* 高性能优化 */
+        @media (prefers-reduced-motion: reduce) {
+            .snowflake {
+                animation: none !important;
+                transform: none !important;
+            }
+        }
+
+        /* 暗色主题适配 */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #0f1419, #1a2332);
+            }
+        }
+
+        /* 高对比度模式适配 */
+        @media (prefers-contrast: high) {
+            .snowflake {
+                text-shadow: 0 0 2px #000000, 0 0 4px #000000;
+            }
+
+            .control-panel {
+                background: rgba(0, 0, 0, 0.8);
+                border: 2px solid #ffffff;
+            }
+        }
+
+        /* 打印样式 */
+        @media print {
+            #snowflake-container,
+            .control-panel {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- 雪花容器 -->
+    <div id="snowflake-container"></div>
+
+    <!-- 控制面板 -->
     <div class="control-panel">
-        <h3>雪花控制</h3>
-        <button id="startBtn">开始</button>
-        <button id="stopBtn">停止</button>
-        <button id="pauseBtn">暂停</button>
-        <button id="resumeBtn">继续</button>
+        <h3>❄️ 雪花控制台</h3>
         
-        <label for="snowflakeCount">雪花数量: <span id="countValue">50</span></label>
-        <input type="range" id="snowflakeCount" min="10" max="200" value="50">
-        
-        <label for="fallSpeed">下落速度: <span id="speedValue">1</span></label>
-        <input type="range" id="fallSpeed" min="0.5" max="3" step="0.1" value="1">
-        
-        <label for="windStrength">风力强度: <span id="windValue">0.5</span></label>
-        <input type="range" id="windStrength" min="0" max="2" step="0.1" value="0.5">
+        <div class="control-group">
+            <label for="snowflake-count">雪花数量</label>
+            <input type="range" id="snowflake-count" min="10" max="200" value="50">
+            <div class="value-display" id="count-value">50</div>
+        </div>
+
+        <div class="control-group">
+            <label for="fall-speed">下落速度</label>
+            <input type="range" id="fall-speed" min="0.5" max="3" step="0.1" value="1">
+            <div class="value-display" id="speed-value">1.0</div>
+        </div>
+
+        <div class="control-group">
+            <label for="wind-strength">风力强度</label>
+            <input type="range" id="wind-strength" min="0" max="2" step="0.1" value="0.5">
+            <div class="value-display" id="wind-value">0.5</div>
+        </div>
+
+        <div class="control-group">
+            <label>
+                <input type="checkbox" id="enable-rotation" checked>
+                启用旋转效果
+            </label>
+        </div>
+
+        <div class="control-group">
+            <label>
+                <input type="checkbox" id="enable-glow" checked>
+                启用发光效果
+            </label>
+        </div>
+
+        <div class="control-buttons">
+            <button onclick="pauseSnowfall()">暂停</button>
+            <button onclick="resumeSnowfall()">继续</button>
+            <button onclick="resetSnowfall()">重置</button>
+        </div>
     </div>
 
     <script>
-        // 雪花物理运动计算模块
-        class SnowflakePhysics {
-            static calculateFallSpeed(snowflake) {
-                const baseSpeed = snowflake.baseSpeed || 1;
-                const sizeMultiplier = snowflake.size * 0.5 + 0.5;
-                return baseSpeed * sizeMultiplier;
-            }
-
-            static calculateSwayMotion(snowflake, time) {
-                const swayAmplitude = snowflake.swayAmplitude || 30;
-                const swayFrequency = snowflake.swayFrequency || 0.01;
-                return Math.sin(time * swayFrequency + snowflake.swayOffset) * swayAmplitude;
-            }
-
-            static updatePosition(snowflake, deltaTime) {
-                const fallSpeed = this.calculateFallSpeed(snowflake);
-                const currentTime = Date.now();
-                const swayX = this.calculateSwayMotion(snowflake, currentTime);
-                
-                snowflake.y += fallSpeed * deltaTime * 0.1;
-                snowflake.x = snowflake.baseX + swayX + (snowflake.windOffset || 0);
-                
-                // 应用风力影响
-                if (snowflake.windStrength) {
-                    snowflake.windOffset = (snowflake.windOffset || 0) + snowflake.windStrength * deltaTime * 0.01;
-                }
-            }
-
-            static checkBoundaries(snowflake) {
-                const screenWidth = window.innerWidth;
-                const screenHeight = window.innerHeight;
-                
-                // 检查是否超出屏幕边界
-                if (snowflake.y > screenHeight + 50) {
-                    return 'bottom';
-                }
-                
-                if (snowflake.x < -50 || snowflake.x > screenWidth + 50) {
-                    return 'side';
-                }
-                
-                return null;
-            }
-        }
-
-        // 雪花生命周期管理模块
-        class SnowflakeLifecycle {
+        class SnowflakeGenerator {
             constructor() {
-                this.snowflakePool = [];
-                this.activeSnowflakes = [];
-                this.snowflakeSymbols = ['❄', '❅', '❆', '✻', '✼', '❈', '❉', '❊'];
-                this.typeClasses = ['type-1', 'type-2', 'type-3', 'type-4', 'type-5'];
-                this.sizeClasses = ['size-small', 'size-medium', 'size-large', 'size-xlarge'];
-                this.opacityClasses = ['opacity-light', 'opacity-medium', 'opacity-heavy'];
-            }
-
-            createSnowflake() {
-                let element;
-                
-                // 从对象池中获取或创建新元素
-                if (this.snowflakePool.length > 0) {
-                    element = this.snowflakePool.pop();
-                } else {
-                    element = document.createElement('div');
-                    element.className = 'snowflake';
-                    document.body.appendChild(element);
-                }
-
-                // 随机属性
-                const symbol = this.snowflakeSymbols[Math.floor(Math.random() * this.snowflakeSymbols.length)];
-                const typeClass = this.typeClasses[Math.floor(Math.random() * this.typeClasses.length)];
-                const sizeClass = this.sizeClasses[Math.floor(Math.random() * this.sizeClasses.length)];
-                const opacityClass = this.opacityClasses[Math.floor(Math.random() * this.opacityClasses.length)];
-                
-                element.textContent = symbol;
-                element.className = `snowflake ${typeClass} ${sizeClass} ${opacityClass}`;
-                
-                // 物理属性
-                const snowflake = {
-                    element: element,
-                    x: Math.random() * window.innerWidth,
-                    y: -50,
-                    baseX: Math.random() * window.innerWidth,
-                    baseSpeed: 0.5 + Math.random() * 2,
-                    size: 0.5 + Math.random() * 1.5,
-                    swayAmplitude: 20 + Math.random() * 40,
-                    swayFrequency: 0.005 + Math.random() * 0.01,
-                    swayOffset: Math.random() * Math.PI * 2,
-                    windOffset: 0,
-                    windStrength: 0
-                };
-                
-                this.activeSnowflakes.push(snowflake);
-                return snowflake;
-            }
-
-            updateSnowflake(snowflake, deltaTime) {
-                SnowflakePhysics.updatePosition(snowflake, deltaTime);
-                
-                // 更新DOM元素位置
-                snowflake.element.style.transform = `translate(${snowflake.x}px, ${snowflake.y}px)`;
-                
-                // 检查边界
-                const boundaryCheck = SnowflakePhysics.checkBoundaries(snowflake);
-                if (boundaryCheck) {
-                    this.recycleSnowflake(snowflake);
-                    return false;
-                }
-                
-                return true;
-            }
-
-            recycleSnowflake(snowflake) {
-                const index = this.activeSnowflakes.indexOf(snowflake);
-                if (index > -1) {
-                    this.activeSnowflakes.splice(index, 1);
-                    snowflake.element.style.display = 'none';
-                    this.snowflakePool.push(snowflake.element);
-                }
-            }
-
-            cleanupSnowflakes() {
-                this.activeSnowflakes.forEach(snowflake => {
-                    snowflake.element.remove();
-                });
-                this.snowflakePool.forEach(element => {
-                    element.remove();
-                });
-                this.activeSnowflakes = [];
-                this.snowflakePool = [];
-            }
-        }
-
-        // 雪花核心功能管理模块
-        class SnowflakeCore {
-            constructor() {
-                this.lifecycle = new SnowflakeLifecycle();
-                this.isRunning = false;
-                this.isPaused = false;
-                this.animationId = null;
-                this.lastTime = 0;
+                this.container = document.getElementById('snowflake-container');
+                this.snowflakes = [];
+                this.isRunning = true;
                 this.config = {
-                    maxSnowflakes: 50,
-                    spawnRate: 0.3,
-                    fallSpeedMultiplier: 1,
-                    windStrength: 0.5
+                    count: 50,
+                    fallSpeed: 1,
+                    windStrength: 0.5,
+                    enableRotation: true,
+                    enableGlow: true
                 };
+                this.snowflakeSymbols = ['❄', '❅', '❆', '✻', '✼', '❈', '❉', '❊'];
+                this.init();
             }
 
             init() {
-                this.setupEventListeners();
-                console.log('雪花动画系统初始化完成');
-            }
-
-            start() {
-                if (this.isRunning) return;
-                
-                this.isRunning = true;
-                this.isPaused = false;
-                this.lastTime = performance.now();
+                this.setupControls();
+                this.createSnowflakes();
                 this.animate();
-                console.log('雪花动画开始');
             }
 
-            stop() {
-                this.isRunning = false;
-                this.isPaused = false;
-                if (this.animationId) {
-                    cancelAnimationFrame(this.animationId);
-                    this.animationId = null;
-                }
-                this.lifecycle.cleanupSnowflakes();
-                console.log('雪花动画停止');
-            }
+            setupControls() {
+                const countSlider = document.getElementById('snowflake-count');
+                const speedSlider = document.getElementById('fall-speed');
+                const windSlider = document.getElementById('wind-strength');
+                const rotationCheckbox = document.getElementById('enable-rotation');
+                const glowCheckbox = document.getElementById('enable-glow');
 
-            pause() {
-                this.isPaused = true;
-                console.log('雪花动画暂停');
-            }
-
-            resume() {
-                if (this.isRunning && this.isPaused) {
-                    this.isPaused = false;
-                    this.lastTime = performance.now();
-                    this.animate();
-                    console.log('雪花动画继续');
-                }
-            }
-
-            updateConfig(newConfig) {
-                Object.assign(this.config, newConfig);
-                
-                // 更新现有雪花的风力强度
-                this.lifecycle.activeSnowflakes.forEach(snowflake => {
-                    snowflake.windStrength = this.config.windStrength;
+                countSlider.addEventListener('input', (e) => {
+                    this.config.count = parseInt(e.target.value);
+                    document.getElementById('count-value').textContent = e.target.value;
+                    this.updateSnowflakeCount();
                 });
+
+                speedSlider.addEventListener('input', (e) => {
+                    this.config.fallSpeed = parseFloat(e.target.value);
+                    document.getElementById('speed-value').textContent = e.target.value;
+                });
+
+                windSlider.addEventListener('input', (e) => {
+                    this.config.windStrength = parseFloat(e.target.value);
+                    document.getElementById('wind-value').textContent = e.target.value;
+                });
+
+                rotationCheckbox.addEventListener('change', (e) => {
+                    this.config.enableRotation = e.target.checked;
+                });
+
+                glowCheckbox.addEventListener('change', (e) => {
+                    this.config.enableGlow = e.target.checked;
+                    this.updateGlowEffect();
+                });
+            }
+
+            createSnowflake() {
+                const snowflake = {
+                    element: document.createElement('div'),
+                    x: Math.random() * window.innerWidth,
+                    y: -20,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: Math.random() * 2 + 1,
+                    rotation: 0,
+                    rotationSpeed: (Math.random() - 0.5) * 4,
+                    symbol: this.snowflakeSymbols[Math.floor(Math.random() * this.snowflakeSymbols.length)]
+                };
+
+                snowflake.element.className = 'snowflake';
+                snowflake.element.textContent = snowflake.symbol;
                 
-                console.log('配置已更新:', this.config);
+                // 随机应用样式变体
+                const typeClass = `type-${Math.floor(Math.random() * 5) + 1}`;
+                const sizeClass = this.getRandomSizeClass();
+                const opacityClass = this.getRandomOpacityClass();
+                
+                snowflake.element.classList.add(typeClass, sizeClass, opacityClass);
+                
+                this.container.appendChild(snowflake.element);
+                return snowflake;
+            }
+
+            getRandomSizeClass() {
+                const sizes = ['size-small', 'size-medium', 'size-large', 'size-xlarge'];
+                const weights = [0.3, 0.4, 0.2, 0.1]; // 小雪花更多
+                const random = Math.random();
+                let sum = 0;
+                
+                for (let i = 0; i < weights.length; i++) {
+                    sum += weights[i];
+                    if (random <= sum) {
+                        return sizes[i];
+                    }
+                }
+                return sizes[1]; // 默认中等大小
+            }
+
+            getRandomOpacityClass() {
+                const opacities = ['opacity-light', 'opacity-medium', 'opacity-heavy', 'opacity-full'];
+                const weights = [0.2, 0.3, 0.3, 0.2];
+                const random = Math.random();
+                let sum = 0;
+                
+                for (let i = 0; i < weights.length; i++) {
+                    sum += weights[i];
+                    if (random <= sum) {
+                        return opacities[i];
+                    }
+                }
+                return opacities[1]; // 默认中等透明度
+            }
+
+            createSnowflakes() {
+                this.clearSnowflakes();
+                for (let i = 0; i < this.config.count; i++) {
+                    this.snowflakes.push(this.createSnowflake());
+                }
+            }
+
+            updateSnowflakeCount() {
+                const currentCount = this.snowflakes.length;
+                const targetCount = this.config.count;
+
+                if (currentCount < targetCount) {
+                    // 添加雪花
+                    for (let i = currentCount; i < targetCount; i++) {
+                        this.snowflakes.push(this.createSnowflake());
+                    }
+                } else if (currentCount > targetCount) {
+                    // 移除雪花
+                    const toRemove = this.snowflakes.splice(targetCount);
+                    toRemove.forEach(snowflake => {
+                        if (snowflake.element.parentNode) {
+                            snowflake.element.parentNode.removeChild(snowflake.element);
+                        }
+                    });
+                }
+            }
+
+            updateGlowEffect() {
+                this.snowflakes.forEach(snowflake => {
+                    if (this.config.enableGlow) {
+                        snowflake.element.style.filter = 'none';
+                    } else {
+                        snowflake.element.style.filter = 'drop-shadow(0 0 0 transparent)';
+                    }
+                });
+            }
+
+            updateSnowflake(snowflake) {
+                if (!this.isRunning) return;
+
+                // 更新位置
+                snowflake.y += snowflake.vy * this.config.fallSpeed;
+                snowflake.x += snowflake.vx + (Math.sin(snowflake.y * 0.01) * this.config.windStrength);
+
+                // 更新旋转
+                if (this.config.enableRotation) {
+                    snowflake.rotation += snowflake.rotationSpeed;
+                }
+
+                // 边界检查
+                if (snowflake.y > window.innerHeight + 20) {
+                    snowflake.y = -20;
+                    snowflake.x = Math.random() * window.innerWidth;
+                }
+
+                if (snowflake.x > window.innerWidth + 20) {
+                    snowflake.x = -20;
+                } else if (snowflake.x < -20) {
+                    snowflake.x = window.innerWidth + 20;
+                }
+
+                // 应用变换
+                const transform = `translate(${snowflake.x}px, ${snowflake.y}px) ${this.config.enableRotation ? `rotate(${snowflake.rotation}deg)` : ''}`;
+                snowflake.element.style.transform = transform;
             }
 
             animate() {
-                if (!this.isRunning || this.isPaused) return;
-                
-                const currentTime = performance.now();
-                const deltaTime = currentTime - this.lastTime;
-                this.lastTime = currentTime;
-                
-                // 生成新雪花
-                if (this.lifecycle.activeSnowflakes.length < this.config.maxSnowflakes) {
-                    if (Math.random() < this.config.spawnRate) {
-                        const newSnowflake = this.lifecycle.createSnowflake();
-                        newSnowflake.baseSpeed *= this.config.fallSpeedMultiplier;
-                        newSnowflake.windStrength = this.config.windStrength;
-                        newSnowflake.element.style.display = 'block';
-                    }
-                }
-                
-                // 更新现有雪花
-                for (let i = this.lifecycle.activeSnowflakes.length - 1; i >= 0; i--) {
-                    const snowflake = this.lifecycle.activeSnowflakes[i];
-                    this.lifecycle.updateSnowflake(snowflake, deltaTime);
-                }
-                
-                this.animationId = requestAnimationFrame(() => this.animate());
+                this.snowflakes.forEach(snowflake => this.updateSnowflake(snowflake));
+                requestAnimationFrame(() => this.animate());
             }
 
-            setupEventListeners() {
-                // 控制按钮事件
-                document.getElementById('startBtn').addEventListener('click', () => this.start());
-                document.getElementById('stopBtn').addEventListener('click', () => this.stop());
-                document.getElementById('pauseBtn').addEventListener('click', () => this.pause());
-                document.getElementById('resumeBtn').addEventListener('click', () => this.resume());
-                
-                // 配置控制事件
-                const countSlider = document.getElementById('snowflakeCount');
-                const countValue = document.getElementById('countValue');
-                countSlider.addEventListener('input', (e) => {
-                    const value = parseInt(e.target.value);
-                    countValue.textContent = value;
-                    this.updateConfig({ maxSnowflakes: value });
+            pause() {
+                this.isRunning = false;
+            }
+
+            resume() {
+                this.isRunning = true;
+            }
+
+            reset() {
+                this.clearSnowflakes();
+                this.createSnowflakes();
+                this.isRunning = true;
+            }
+
+            clearSnowflakes() {
+                this.snowflakes.forEach(snowflake => {
+                    if (snowflake.element.parentNode) {
+                        snowflake.element.parentNode.removeChild(snowflake.element);
+                    }
                 });
-                
-                const speedSlider = document.getElementById('fallSpeed');
-                const speedValue = document.getElementById('speedValue');
-                speedSlider.addEventListener('input', (e) => {
-                    const value = parseFloat(e.target.value);
-                    speedValue.textContent = value;
-                    this.updateConfig({ fallSpeedMultiplier: value });
-                });
-                
-                const windSlider = document.getElementById('windStrength');
-                const windValue = document.getElementById('windValue');
-                windSlider.addEventListener('input', (e) => {
-                    const value = parseFloat(e.target.value);
-                    windValue.textContent = value;
-                    this.updateConfig({ windStrength: value });
-                });
-                
-                // 窗口大小变化事件
-                window.addEventListener('resize', () => {
-                    // 重新计算雪花位置边界
-                    this.lifecycle.activeSnowflakes.forEach(snowflake => {
-                        if (snowflake.x > window.innerWidth) {
-                            snowflake.baseX = Math.random() * window.innerWidth;
-                            snowflake.x = snowflake.baseX;
-                        }
-                    });
-                });
+                this.snowflakes = [];
             }
         }
 
-        // 初始化并启动雪花动画系统
+        // 全局控制函数
+        let snowGenerator;
+
+        function pauseSnowfall() {
+            if (snowGenerator) {
+                snowGenerator.pause();
+            }
+        }
+
+        function resumeSnowfall() {
+            if (snowGenerator) {
+                snowGenerator.resume();
+            }
+        }
+
+        function resetSnowfall() {
+            if (snowGenerator) {
+                snowGenerator.reset();
+            }
+        }
+
+        // 窗口大小变化处理
+        window.addEventListener('resize', () => {
+            if (snowGenerator) {
+                // 重新调整雪花位置以适应新的窗口大小
+                snowGenerator.snowflakes.forEach(snowflake => {
+                    if (snowflake.x > window.innerWidth) {
+                        snowflake.x = window.innerWidth;
+                    }
+                });
+            }
+        });
+
+        // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', () => {
-            const snowflakeCore = new SnowflakeCore();
-            snowflakeCore.init();
-            
-            // 自动开始动画
-            setTimeout(() => {
-                snowflakeCore.start();
-            }, 500);
-            
-            // 全局暴露核心实例，便于调试
-            window.snowflakeCore = snowflakeCore;
+            snowGenerator = new SnowflakeGenerator();
+        });
+
+        // 页面可见性变化处理（优化性能）
+        document.addEventListener('visibilitychange', () => {
+            if (snowGenerator) {
+                if (document.hidden) {
+                    snowGenerator.pause();
+                } else {
+                    snowGenerator.resume();
+                }
+            }
         });
     </script>
 </body>
