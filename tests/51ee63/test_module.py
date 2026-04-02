@@ -1,4 +1,4 @@
-"""测试: 雪花动画引擎开发"""
+"""测试: 雪花特效技术方案设计"""
 import os
 from pathlib import Path
 
