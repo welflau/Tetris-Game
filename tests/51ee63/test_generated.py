@@ -1,78 +1,93 @@
 import pytest
 from pathlib import Path
+from bs4 import BeautifulSoup
 import re
 
 class TestSnowflakeEffectFrontend:
     
-    def test_index_html_file_exists(self):
-        """测试 index.html 文件是否存在"""
-        index_file = Path("frontend/index.html")
-        assert index_file.exists(), "index.html 文件不存在"
-        assert index_file.is_file(), "index.html 不是一个有效的文件"
+    def test_html_file_exists(self):
+        """测试HTML文件是否存在"""
+        html_file = Path("frontend/index.html")
+        assert html_file.exists(), "index.html文件不存在"
+        assert html_file.is_file(), "index.html不是一个有效的文件"
     
-    def test_index_html_contains_snowflake_elements(self):
-        """测试 index.html 文件是否包含雪花特效相关的关键元素"""
-        index_file = Path("frontend/index.html")
-        assert index_file.exists(), "index.html 文件不存在"
+    def test_html_contains_snowflake_elements(self):
+        """测试HTML文件是否包含雪花特效相关的关键元素"""
+        html_file = Path("frontend/index.html")
         
-        content = index_file.read_text(encoding='utf-8')
+        with open(html_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+            soup = BeautifulSoup(content, 'html.parser')
         
-        # 检查是否包含基本的HTML结构
-        assert '<html' in content.lower(), "缺少 HTML 标签"
-        assert '<head>' in content.lower() or '<head ' in content.lower(), "缺少 head 标签"
-        assert '<body>' in content.lower() or '<body ' in content.lower(), "缺少 body 标签"
+        # 检查是否包含canvas元素（通常用于雪花动画）
+        canvas_elements = soup.find_all('canvas')
+        script_elements = soup.find_all('script')
         
-        # 检查是否包含雪花特效相关的元素或类名
-        snowflake_keywords = ['snowflake', 'snow', '雪花', 'particle', 'effect']
-        has_snowflake_content = any(keyword in content.lower() for keyword in snowflake_keywords)
-        assert has_snowflake_content, "HTML 文件中未找到雪花特效相关内容"
+        # 至少应该有canvas或script标签来实现雪花效果
+        assert len(canvas_elements) > 0 or len(script_elements) > 0, "HTML文件缺少雪花特效实现元素"
+        
+        # 检查内容中是否包含雪花相关关键词
+        content_lower = content.lower()
+        snowflake_keywords = ['snow', 'flake', '雪花', 'particle', 'animation']
+        has_snowflake_keyword = any(keyword in content_lower for keyword in snowflake_keywords)
+        assert has_snowflake_keyword, "HTML文件内容中未找到雪花特效相关关键词"
     
-    def test_index_html_has_css_and_js_references(self):
-        """测试 index.html 文件是否包含 CSS 和 JavaScript 引用，用于实现雪花特效样式和层级处理"""
-        index_file = Path("frontend/index.html")
-        assert index_file.exists(), "index.html 文件不存在"
+    def test_html_performance_optimization_indicators(self):
+        """测试HTML文件是否包含性能优化相关的指标和元素"""
+        html_file = Path("frontend/index.html")
         
-        content = index_file.read_text(encoding='utf-8')
+        with open(html_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+            soup = BeautifulSoup(content, 'html.parser')
         
-        # 检查是否包含 CSS 引用（内联样式或外部文件）
-        has_css = ('<style' in content.lower() or 
-                  '<link' in content.lower() and 'stylesheet' in content.lower() or
-                  'z-index' in content.lower() or
-                  'position' in content.lower())
-        assert has_css, "未找到 CSS 样式引用，无法实现雪花特效样式"
+        # 检查是否有性能优化相关的meta标签
+        meta_tags = soup.find_all('meta')
+        viewport_meta = any('viewport' in str(meta) for meta in meta_tags)
         
-        # 检查是否包含 JavaScript 引用（内联脚本或外部文件）
-        has_js = ('<script' in content.lower())
-        assert has_js, "未找到 JavaScript 脚本引用，无法实现雪花特效动画"
+        # 检查是否有requestAnimationFrame或其他性能优化相关代码
+        performance_keywords = ['requestanimationframe', 'performance', 'optimize', '优化', 'fps']
+        content_lower = content.lower()
+        has_performance_code = any(keyword in content_lower for keyword in performance_keywords)
+        
+        assert viewport_meta or has_performance_code, "HTML文件中未找到性能优化相关的代码或配置"
     
-    def test_dev_notes_file_exists_and_contains_project_info(self):
-        """测试开发文档是否存在并包含项目相关信息"""
-        dev_notes_file = Path("docs/51ee63/461647/dev-notes.md")
-        assert dev_notes_file.exists(), "开发文档 dev-notes.md 不存在"
-        assert dev_notes_file.is_file(), "dev-notes.md 不是一个有效的文件"
+    def test_dev_notes_file_exists_and_valid(self):
+        """测试开发文档是否存在且包含有效内容"""
+        dev_notes_file = Path("docs/51ee63/16dedc/dev-notes.md")
         
-        content = dev_notes_file.read_text(encoding='utf-8')
+        assert dev_notes_file.exists(), "开发文档文件不存在"
+        assert dev_notes_file.is_file(), "开发文档不是一个有效的文件"
+        
+        with open(dev_notes_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # 检查文档是否为空
         assert len(content.strip()) > 0, "开发文档内容为空"
         
-        # 检查是否包含项目相关的关键词
-        project_keywords = ['雪花', 'snowflake', '特效', 'effect', '层级', 'layer', 'z-index']
-        has_project_content = any(keyword in content.lower() for keyword in project_keywords)
-        assert has_project_content, "开发文档中未找到项目相关内容"
+        # 检查是否包含开发相关关键词
+        dev_keywords = ['优化', '性能', 'performance', '雪花', 'snow', '特效', 'effect']
+        content_lower = content.lower()
+        has_dev_keyword = any(keyword in content_lower for keyword in dev_keywords)
+        assert has_dev_keyword, "开发文档中未找到项目相关的关键词"
     
-    def test_html_structure_for_layered_effects(self):
-        """测试 HTML 结构是否支持层级效果处理"""
-        index_file = Path("frontend/index.html")
-        assert index_file.exists(), "index.html 文件不存在"
+    def test_html_structure_validity(self):
+        """测试HTML文件结构的有效性"""
+        html_file = Path("frontend/index.html")
         
-        content = index_file.read_text(encoding='utf-8')
+        with open(html_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+            soup = BeautifulSoup(content, 'html.parser')
         
-        # 检查是否有容器元素用于承载雪花特效
-        container_patterns = [
-            r'<div[^>]*class[^>]*["\'][^"\']*container[^"\']*["\']',
-            r'<div[^>]*id[^>]*["\'][^"\']*snow[^"\']*["\']',
-            r'<canvas',
-            r'<div[^>]*class[^>]*["\'][^"\']*snow[^"\']*["\']'
-        ]
+        # 检查基本HTML结构
+        html_tag = soup.find('html')
+        head_tag = soup.find('head')
+        body_tag = soup.find('body')
         
-        has_container = any(re.search(pattern, content, re.IGNORECASE) for pattern in container_patterns)
-        assert has_container, "未找到用于承载雪花特效的容器元素"
+        assert html_tag is not None, "HTML文件缺少html标签"
+        assert head_tag is not None, "HTML文件缺少head标签"
+        assert body_tag is not None, "HTML文件缺少body标签"
+        
+        # 检查title标签
+        title_tag = soup.find('title')
+        assert title_tag is not None, "HTML文件缺少title标签"
+        assert len(title_tag.get_text().strip()) > 0, "title标签内容为空"
