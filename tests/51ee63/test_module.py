@@ -18,57 +18,71 @@ class TestSnowflakeEffect:
         
         content = html_file.read_text(encoding='utf-8')
         
-        # 检查是否包含canvas元素或雪花相关的div
-        canvas_pattern = r'<canvas[^>]*>'
-        snowflake_pattern = r'(snowflake|snow|雪花)'
+        # 检查是否包含canvas元素（通常用于雪花动画）
+        assert re.search(r'<canvas[^>]*>', content, re.IGNORECASE), "HTML中缺少canvas元素"
         
-        assert re.search(canvas_pattern, content, re.IGNORECASE) or \
-               re.search(snowflake_pattern, content, re.IGNORECASE), \
-               "HTML文件中未找到雪花特效相关元素"
+        # 检查是否包含JavaScript相关内容
+        js_patterns = [
+            r'<script[^>]*>',
+            r'\.js["\']',
+            r'snowflake',
+            r'snow'
+        ]
         
-        # 检查是否包含JavaScript代码
-        js_pattern = r'<script[^>]*>|\.js'
-        assert re.search(js_pattern, content, re.IGNORECASE), \
-               "HTML文件中未找到JavaScript相关代码"
+        has_js = any(re.search(pattern, content, re.IGNORECASE) for pattern in js_patterns)
+        assert has_js, "HTML中缺少JavaScript相关内容或雪花特效相关代码"
     
-    def test_dev_notes_documentation_exists(self):
-        """测试开发文档是否存在并包含有效内容"""
-        docs_file = Path("docs/51ee63/19a016/dev-notes.md")
-        assert docs_file.exists(), "开发文档文件不存在"
-        assert docs_file.is_file(), "开发文档不是一个有效的文件"
-        
-        content = docs_file.read_text(encoding='utf-8')
-        assert len(content.strip()) > 0, "开发文档内容为空"
-        
-        # 检查是否包含markdown格式的内容
-        markdown_indicators = ['#', '##', '###', '-', '*', '```']
-        has_markdown = any(indicator in content for indicator in markdown_indicators)
-        assert has_markdown, "开发文档似乎不包含有效的markdown格式内容"
-    
-    def test_project_structure_integrity(self):
-        """测试项目结构完整性"""
-        # 检查根目录下的关键文件
-        root_files = [Path("index.html")]
-        for file_path in root_files:
-            assert file_path.exists(), f"关键文件 {file_path} 缺失"
-        
-        # 检查docs目录结构
-        docs_dir = Path("docs")
-        if docs_dir.exists():
-            dev_notes = Path("docs/51ee63/19a016/dev-notes.md")
-            assert dev_notes.exists(), "开发文档路径结构不完整"
-    
-    def test_html_basic_structure(self):
-        """测试HTML文件基本结构是否完整"""
+    def test_html_structure_validity(self):
+        """测试HTML文件的基本结构完整性"""
         html_file = Path("index.html")
         content = html_file.read_text(encoding='utf-8')
         
         # 检查基本HTML结构
-        assert '<html' in content.lower(), "HTML文件缺少html标签"
-        assert '<head' in content.lower(), "HTML文件缺少head标签"
-        assert '<body' in content.lower(), "HTML文件缺少body标签"
+        assert re.search(r'<!DOCTYPE\s+html>', content, re.IGNORECASE), "缺少DOCTYPE声明"
+        assert re.search(r'<html[^>]*>', content, re.IGNORECASE), "缺少html标签"
+        assert re.search(r'<head[^>]*>', content, re.IGNORECASE), "缺少head标签"
+        assert re.search(r'<body[^>]*>', content, re.IGNORECASE), "缺少body标签"
         
-        # 检查是否有title标签
-        title_pattern = r'<title[^>]*>.*?</title>'
-        assert re.search(title_pattern, content, re.IGNORECASE | re.DOTALL), \
-               "HTML文件缺少title标签"
+        # 检查标签配对
+        open_tags = len(re.findall(r'<html[^>]*>', content, re.IGNORECASE))
+        close_tags = len(re.findall(r'</html>', content, re.IGNORECASE))
+        assert open_tags == close_tags, "html标签未正确闭合"
+    
+    def test_dev_notes_file_exists(self):
+        """测试开发文档是否存在"""
+        docs_file = Path("docs/51ee63/19a016/dev-notes.md")
+        assert docs_file.exists(), "开发文档文件不存在"
+        assert docs_file.is_file(), "开发文档不是一个有效的文件"
+        assert docs_file.suffix == '.md', "开发文档不是markdown格式"
+    
+    def test_dev_notes_content(self):
+        """测试开发文档内容是否包含必要信息"""
+        docs_file = Path("docs/51ee63/19a016/dev-notes.md")
+        assert docs_file.exists(), "开发文档不存在，无法进行内容测试"
+        
+        content = docs_file.read_text(encoding='utf-8')
+        assert len(content.strip()) > 0, "开发文档内容为空"
+        
+        # 检查是否包含常见的开发文档关键词
+        keywords = ['雪花', 'snowflake', '特效', 'effect', '开发', 'dev', '说明', '文档']
+        has_keywords = any(keyword in content for keyword in keywords)
+        assert has_keywords, "开发文档缺少相关关键词内容"
+    
+    def test_project_directory_structure(self):
+        """测试项目目录结构的完整性"""
+        # 检查根目录文件
+        assert Path("index.html").exists(), "根目录缺少index.html"
+        
+        # 检查docs目录结构
+        docs_dir = Path("docs")
+        assert docs_dir.exists(), "docs目录不存在"
+        assert docs_dir.is_dir(), "docs不是一个目录"
+        
+        # 检查嵌套目录结构
+        nested_dir = Path("docs/51ee63/19a016")
+        assert nested_dir.exists(), "嵌套文档目录不存在"
+        assert nested_dir.is_dir(), "嵌套路径不是目录"
+        
+        # 检查开发文档
+        dev_notes = Path("docs/51ee63/19a016/dev-notes.md")
+        assert dev_notes.exists(), "开发文档不存在于指定路径"
